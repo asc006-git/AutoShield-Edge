@@ -1,0 +1,300 @@
+[
+  {
+    "timestamp": "2026-06-23T13:06:21.152330",
+    "window_index": 5236,
+    "risk_category": "Secure",
+    "health_score": 80.61,
+    "trend_label": "Degrading",
+    "attack_type": null,
+    "response_level": 0,
+    "level_label": "Monitor",
+    "actions": [
+      {
+        "id": "gen_l0_1",
+        "name": "Monitor",
+        "description": "Generic response \u2014 escalate to operator",
+        "target": "network",
+        "automated": true,
+        "reversible": true
+      }
+    ],
+    "confidence": 0.1245,
+    "expected_outcome": "No anomalies \u2014 continued safe operation",
+    "recovery_strategy": "Automatic \u2014 no recovery needed",
+    "safety_notes": "No safety impact"
+  },
+  {
+    "timestamp": "2026-06-23T13:06:21.153565",
+    "window_index": 22191,
+    "risk_category": "High Risk",
+    "health_score": 22.28,
+    "trend_label": "Stable",
+    "attack_type": "DoS",
+    "response_level": 2,
+    "level_label": "Contain",
+    "actions": [
+      {
+        "id": "dos_cont_1",
+        "name": "Rate limiting activation",
+        "description": "Activate gateway rate limiter for suspected CAN IDs",
+        "target": "CAN bus",
+        "execution_time_ms": 50,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "may delay legitimate high-priority messages"
+      },
+      {
+        "id": "dos_cont_2",
+        "name": "Suspected ECU monitoring",
+        "description": "Increase sampling rate on suspected ECU",
+        "target": "ECU",
+        "execution_time_ms": 20,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "dos_mon_1",
+        "name": "Passive monitoring",
+        "description": "Monitor CAN bus message rate and ID distribution",
+        "target": "CAN bus",
+        "execution_time_ms": 0,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "dos_alert_1",
+        "name": "Rate anomaly notification",
+        "description": "Alert fleet operator of abnormal CAN message rate",
+        "target": "network",
+        "execution_time_ms": 5,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      }
+    ],
+    "confidence": 0.7378,
+    "expected_outcome": "Attack contained; further spread prevented",
+    "recovery_strategy": "Semi-automatic \u2014 resume normal after N windows of stable health > 60",
+    "safety_notes": "Minimal \u2014 actions are reversible"
+  },
+  {
+    "timestamp": "2026-06-23T13:06:21.153565",
+    "window_index": 107872,
+    "risk_category": "Critical",
+    "health_score": 13.45,
+    "trend_label": "Degrading",
+    "attack_type": "Fuzzy",
+    "response_level": 4,
+    "level_label": "Emergency Response",
+    "actions": [
+      {
+        "id": "fz_emer_1",
+        "name": "Full ID lockdown",
+        "description": "Lock CAN bus to known-good ID set only",
+        "target": "CAN bus",
+        "execution_time_ms": 200,
+        "automated": true,
+        "reversible": false,
+        "side_effects": "blocks all new CAN communications"
+      },
+      {
+        "id": "fz_emer_2",
+        "name": "Network segmentation",
+        "description": "Isolate affected CAN segment",
+        "target": "CAN bus",
+        "execution_time_ms": 500,
+        "automated": true,
+        "reversible": false,
+        "side_effects": "temporary zone isolation"
+      },
+      {
+        "id": "fz_emer_3",
+        "name": "Emergency diagnostics",
+        "description": "Log all CAN traffic for forensic analysis",
+        "target": "CAN bus",
+        "execution_time_ms": 100,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "fz_mon_1",
+        "name": "CAN ID entropy monitoring",
+        "description": "Track CAN ID entropy and diversity metrics",
+        "target": "CAN bus",
+        "execution_time_ms": 0,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "fz_alert_1",
+        "name": "ID diversity alert",
+        "description": "Alert operator of abnormal CAN ID entropy",
+        "target": "network",
+        "execution_time_ms": 5,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "fz_cont_1",
+        "name": "Invalid frame monitoring",
+        "description": "Flag messages from unrecognized CAN IDs",
+        "target": "CAN bus",
+        "execution_time_ms": 20,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "fz_cont_2",
+        "name": "Enhanced payload inspection",
+        "description": "Deep packet inspection on flagged messages",
+        "target": "CAN bus",
+        "execution_time_ms": 30,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "fz_mit_1",
+        "name": "CAN ID whitelist enforcement",
+        "description": "Block all messages from non-whitelisted CAN IDs",
+        "target": "CAN bus",
+        "execution_time_ms": 150,
+        "automated": true,
+        "reversible": false,
+        "side_effects": "may block legitimate new CAN IDs"
+      },
+      {
+        "id": "fz_mit_2",
+        "name": "Invalid frame blocking",
+        "description": "Drop frames with invalid payload patterns",
+        "target": "CAN bus",
+        "execution_time_ms": 30,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      }
+    ],
+    "confidence": 0.9021,
+    "expected_outcome": "Emergency response active; vehicle in safe state",
+    "recovery_strategy": "Full system reset \u2014 service center inspection required",
+    "safety_notes": "HIGH \u2014 vehicle may enter limp-home mode"
+  },
+  {
+    "timestamp": "2026-06-23T13:06:21.153565",
+    "window_index": 191782,
+    "risk_category": "High Risk",
+    "health_score": 33.29,
+    "trend_label": "Improving",
+    "attack_type": "Gear",
+    "response_level": 2,
+    "level_label": "Contain",
+    "actions": [
+      {
+        "id": "gr_cont_1",
+        "name": "Sensor cross-validation",
+        "description": "Cross-check gear position against wheel speed and RPM",
+        "target": "ECU",
+        "execution_time_ms": 40,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "gr_cont_2",
+        "name": "Plausibility check activation",
+        "description": "Validate gear transitions against vehicle dynamics model",
+        "target": "ECU",
+        "execution_time_ms": 30,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "gr_mon_1",
+        "name": "Gear message monitoring",
+        "description": "Monitor gear position message rate and values",
+        "target": "CAN bus",
+        "execution_time_ms": 0,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "gr_alert_1",
+        "name": "Gear anomaly notification",
+        "description": "Alert operator of inconsistent gear messages",
+        "target": "network",
+        "execution_time_ms": 5,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      }
+    ],
+    "confidence": 0.6576,
+    "expected_outcome": "Attack contained; further spread prevented",
+    "recovery_strategy": "Semi-automatic \u2014 resume normal after N windows of stable health > 60",
+    "safety_notes": "Minimal \u2014 actions are reversible"
+  },
+  {
+    "timestamp": "2026-06-23T13:06:21.153565",
+    "window_index": 308662,
+    "risk_category": "High Risk",
+    "health_score": 32.46,
+    "trend_label": "Improving",
+    "attack_type": "RPM",
+    "response_level": 2,
+    "level_label": "Contain",
+    "actions": [
+      {
+        "id": "rp_cont_1",
+        "name": "RPM sensor cross-validation",
+        "description": "Cross-check RPM against wheel speed and engine acoustics",
+        "target": "ECU",
+        "execution_time_ms": 40,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "rp_cont_2",
+        "name": "Engine behavior analysis",
+        "description": "Analyze RPM patterns for spoofing signatures",
+        "target": "ECU",
+        "execution_time_ms": 30,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "rp_mon_1",
+        "name": "RPM message monitoring",
+        "description": "Monitor engine RPM message rate and values",
+        "target": "CAN bus",
+        "execution_time_ms": 0,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      },
+      {
+        "id": "rp_alert_1",
+        "name": "RPM anomaly notification",
+        "description": "Alert operator of abnormal RPM readings",
+        "target": "network",
+        "execution_time_ms": 5,
+        "automated": true,
+        "reversible": true,
+        "side_effects": "none"
+      }
+    ],
+    "confidence": 0.6637,
+    "expected_outcome": "Attack contained; further spread prevented",
+    "recovery_strategy": "Semi-automatic \u2014 resume normal after N windows of stable health > 60",
+    "safety_notes": "Minimal \u2014 actions are reversible"
+  }
+]
