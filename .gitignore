@@ -1,0 +1,85 @@
+# AutoShield Edge - .gitignore
+
+# ============================================
+# Large Data Files
+# ============================================
+dataset/
+data/
+*.csv
+*.txt
+!requirements.txt
+!docs/**/*.txt
+*.parquet
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.npy
+*.npz
+
+# ============================================
+# Logs
+# ============================================
+*.log
+logs/
+
+# ============================================
+# Python Bytecode & Cache
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# ============================================
+# Virtual Environment
+# ============================================
+.venv/
+venv/
+env/
+.conda/
+ENV/
+
+# ============================================
+# IDE & Editor
+# ============================================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.iml
+
+# ============================================
+# Jupyter Notebook artifacts
+# ============================================
+.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# ============================================
+# Environment & Secrets
+# ============================================
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+*.cert
+
+# ============================================
+# OS & System
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
