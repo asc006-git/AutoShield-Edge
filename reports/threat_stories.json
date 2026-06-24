@@ -1,0 +1,418 @@
+{
+  "normal": {
+    "metadata": {
+      "engine": "AutoShield Edge Threat Story Engine v1",
+      "generated_at": "2026-06-23T12:52:27.277288",
+      "window_index": 5236,
+      "window_size": 50
+    },
+    "threat_summary": "Vehicle cybersecurity status is Secure. No anomalous activity detected.",
+    "risk_category": "Secure",
+    "health_score": 80.61,
+    "trend": {
+      "label": "Degrading",
+      "magnitude": -3.4,
+      "description": "Cyber Health is 81/100 and degrading over the last 10 windows. All monitoring dimensions show normal behavior."
+    },
+    "root_cause_analysis": {
+      "primary_component": "Stability",
+      "component_breakdown": {
+        "Threat": 0.8699,
+        "Stability": 0.5272,
+        "Pressure": 1.0
+      },
+      "primary_feature": {
+        "name": "can_id_entropy",
+        "label": "CAN identifier entropy",
+        "z_score": -1.421,
+        "deviation": "below normal"
+      },
+      "feature_attributions": {
+        "messages_per_second": {
+          "label": "CAN message rate",
+          "z_score": -0.929,
+          "healthiness": 0.6153
+        },
+        "unique_can_ids_window": {
+          "label": "CAN ID diversity",
+          "z_score": -1.171,
+          "healthiness": 0.5234
+        },
+        "can_id_entropy": {
+          "label": "CAN identifier entropy",
+          "z_score": -1.421,
+          "healthiness": 0.443
+        },
+        "message_burst_score": {
+          "label": "message burst activity",
+          "z_score": -0.027,
+          "healthiness": 1.0
+        },
+        "frequency_spike_score": {
+          "label": "timing irregularity",
+          "z_score": -0.136,
+          "healthiness": 1.0
+        },
+        "payload_instability_score": {
+          "label": "payload variation",
+          "z_score": 0.02,
+          "healthiness": 1.0
+        },
+        "anomaly_score": {
+          "label": "overall anomaly signal",
+          "z_score": -0.409,
+          "healthiness": 0.8699
+        }
+      },
+      "root_cause_text": "No significant deviations detected. All features within expected operating ranges."
+    },
+    "future_risk_forecast": {
+      "horizon_windows": 20,
+      "projected_health": 82.29,
+      "forecast_text": "Projected to remain Secure at 82/100 over the next 20 windows."
+    },
+    "recommended_response": "No action required. Continue passive monitoring.",
+    "attack_context": null,
+    "narrative": "Vehicle cybersecurity status is Secure. No anomalous activity detected. Cyber Health is 81/100 and degrading over the last 10 windows. All monitoring dimensions show normal behavior."
+  },
+  "dos": {
+    "metadata": {
+      "engine": "AutoShield Edge Threat Story Engine v1",
+      "generated_at": "2026-06-23T12:52:27.279296",
+      "window_index": 22191,
+      "window_size": 50
+    },
+    "threat_summary": "HIGH RISK: Strong indicators of active cyber attack detected. Vehicle cybersecurity is compromised \u2014 immediate attention required.",
+    "risk_category": "High Risk",
+    "health_score": 22.28,
+    "trend": {
+      "label": "Stable",
+      "magnitude": 1.86,
+      "description": "Cyber Health dropped to 22/100 and is stable over the last 10 windows. Primary concern: Threat component (0% of normal)."
+    },
+    "root_cause_analysis": {
+      "primary_component": "Threat",
+      "component_breakdown": {
+        "Threat": 0.0006,
+        "Stability": 0.0618,
+        "Pressure": 0.6799
+      },
+      "primary_feature": {
+        "name": "anomaly_score",
+        "label": "overall anomaly signal",
+        "z_score": -11.273,
+        "deviation": "below normal"
+      },
+      "feature_attributions": {
+        "messages_per_second": {
+          "label": "CAN message rate",
+          "z_score": 5.831,
+          "healthiness": 0.0234
+        },
+        "unique_can_ids_window": {
+          "label": "CAN ID diversity",
+          "z_score": -2.93,
+          "healthiness": 0.162
+        },
+        "can_id_entropy": {
+          "label": "CAN identifier entropy",
+          "z_score": -25.217,
+          "healthiness": 0.0
+        },
+        "message_burst_score": {
+          "label": "message burst activity",
+          "z_score": 2.82,
+          "healthiness": 0.1744
+        },
+        "frequency_spike_score": {
+          "label": "timing irregularity",
+          "z_score": 0.417,
+          "healthiness": 0.8654
+        },
+        "payload_instability_score": {
+          "label": "payload variation",
+          "z_score": -1.114,
+          "healthiness": 1.0
+        },
+        "anomaly_score": {
+          "label": "overall anomaly signal",
+          "z_score": -11.273,
+          "healthiness": 0.0006
+        }
+      },
+      "root_cause_text": "Attack signature detected. Primary driver: Threat \u2014 overall anomaly signal at -11.3 sigma from normal (below normal). Secondary feature: overall anomaly signal at -11.3 sigma."
+    },
+    "future_risk_forecast": {
+      "horizon_windows": 20,
+      "projected_health": 65.71,
+      "forecast_text": "Critical escalation risk. Health projected at 66/100 in 20 windows \u2014 may cross into Critical range."
+    },
+    "recommended_response": "ACTIVATE COUNTERMEASURES: Isolate suspected ECUs. Enable rate-limiting on CAN bus. Alert fleet operator. Log forensic data for post-incident analysis.",
+    "attack_context": {
+      "attack_type": "DoS",
+      "attack_info": {
+        "attack_type": "Denial of Service",
+        "mechanism": "CAN bus flooding with high-priority messages",
+        "signature": "elevated message rate with reduced CAN ID diversity",
+        "impact": "bandwidth exhaustion, ECU denial of service",
+        "mitigation": "rate-limiting gateway filter, suspect ECU isolation"
+      }
+    },
+    "narrative": "HIGH RISK: Strong indicators of active cyber attack detected. Vehicle cybersecurity is compromised \u2014 immediate attention required. Cyber Health dropped to 22/100 and is stable over the last 10 windows. Primary concern: Threat component (0% of normal). Pattern matches Denial of Service attack: elevated message rate with reduced CAN ID diversity. Impact: bandwidth exhaustion, ECU denial of service. Root cause: Attack signature detected. Primary driver: Threat \u2014 overall anomaly signal at -11.3 sigma from normal (below normal). Secondary feature: overall anomaly signal at -11.3 sigma. Critical escalation risk. Health projected at 66/100 in 20 windows \u2014 may cross into Critical range. Recommended: ACTIVATE COUNTERMEASURES: Isolate suspected ECUs. Enable rate-limiting on CAN bus. Alert fleet operator. Log forensic data for post-incident analysis."
+  },
+  "fuzzy": {
+    "metadata": {
+      "engine": "AutoShield Edge Threat Story Engine v1",
+      "generated_at": "2026-06-23T12:52:27.281305",
+      "window_index": 107872,
+      "window_size": 50
+    },
+    "threat_summary": "CRITICAL: Confirmed cyber attack in progress. Vehicle cybersecurity health is at a dangerous level.",
+    "risk_category": "Critical",
+    "health_score": 13.45,
+    "trend": {
+      "label": "Degrading",
+      "magnitude": -3.22,
+      "description": "Cyber Health is 13/100 \u2014 Critical level. Health has degrading by 3 points over the last 10 windows."
+    },
+    "root_cause_analysis": {
+      "primary_component": "Threat",
+      "component_breakdown": {
+        "Threat": 0.0006,
+        "Stability": 0.2675,
+        "Pressure": 0.1801
+      },
+      "primary_feature": {
+        "name": "anomaly_score",
+        "label": "overall anomaly signal",
+        "z_score": -11.272,
+        "deviation": "below normal"
+      },
+      "feature_attributions": {
+        "messages_per_second": {
+          "label": "CAN message rate",
+          "z_score": 0.531,
+          "healthiness": 0.8021
+        },
+        "unique_can_ids_window": {
+          "label": "CAN ID diversity",
+          "z_score": 14.657,
+          "healthiness": 0.0001
+        },
+        "can_id_entropy": {
+          "label": "CAN identifier entropy",
+          "z_score": 12.771,
+          "healthiness": 0.0002
+        },
+        "message_burst_score": {
+          "label": "message burst activity",
+          "z_score": 1.883,
+          "healthiness": 0.3255
+        },
+        "frequency_spike_score": {
+          "label": "timing irregularity",
+          "z_score": 2.798,
+          "healthiness": 0.177
+        },
+        "payload_instability_score": {
+          "label": "payload variation",
+          "z_score": 5.114,
+          "healthiness": 0.0378
+        },
+        "anomaly_score": {
+          "label": "overall anomaly signal",
+          "z_score": -11.272,
+          "healthiness": 0.0006
+        }
+      },
+      "root_cause_text": "Confirmed attack pattern. Primary driver: Threat \u2014 overall anomaly signal at -11.3 sigma from normal (below normal). Multiple features outside safe bounds: CAN ID diversity, CAN identifier entropy, message burst activity, timing irregularity, payload variation."
+    },
+    "future_risk_forecast": {
+      "horizon_windows": 20,
+      "projected_health": 64.89,
+      "forecast_text": "Health projected to remain at 65/100 or lower. Immediate intervention required to prevent system compromise."
+    },
+    "recommended_response": "EMERGENCY RESPONSE: Isolate vehicle from network. Engage fail-safe mode on all ECUs. Initiate forensic data capture. Alert security operations center.",
+    "attack_context": {
+      "attack_type": "Fuzzy",
+      "attack_info": {
+        "attack_type": "Fuzzy",
+        "mechanism": "Randomized CAN ID and payload injection",
+        "signature": "abnormal CAN ID diversity and entropy",
+        "impact": "unpredictable ECU behavior, potential system crash",
+        "mitigation": "CAN ID whitelist, payload validation gateway"
+      }
+    },
+    "narrative": "CRITICAL: Confirmed cyber attack in progress. Vehicle cybersecurity health is at a dangerous level. Cyber Health is 13/100 \u2014 Critical level. Health has degrading by 3 points over the last 10 windows. Pattern matches Fuzzy attack: abnormal CAN ID diversity and entropy. Impact: unpredictable ECU behavior, potential system crash. Root cause: Confirmed attack pattern. Primary driver: Threat \u2014 overall anomaly signal at -11.3 sigma from normal (below normal). Multiple features outside safe bounds: CAN ID diversity, CAN identifier entropy, message burst activity, timing irregularity, payload variation. Health projected to remain at 65/100 or lower. Immediate intervention required to prevent system compromise. Recommended: EMERGENCY RESPONSE: Isolate vehicle from network. Engage fail-safe mode on all ECUs. Initiate forensic data capture. Alert security operations center."
+  },
+  "gear": {
+    "metadata": {
+      "engine": "AutoShield Edge Threat Story Engine v1",
+      "generated_at": "2026-06-23T12:52:27.281305",
+      "window_index": 191782,
+      "window_size": 50
+    },
+    "threat_summary": "HIGH RISK: Strong indicators of active cyber attack detected. Vehicle cybersecurity is compromised \u2014 immediate attention required.",
+    "risk_category": "High Risk",
+    "health_score": 33.29,
+    "trend": {
+      "label": "Improving",
+      "magnitude": 2.93,
+      "description": "Cyber Health dropped to 33/100 and is improving over the last 10 windows. Primary concern: Threat component (0% of normal)."
+    },
+    "root_cause_analysis": {
+      "primary_component": "Threat",
+      "component_breakdown": {
+        "Threat": 0.0011,
+        "Stability": 0.108,
+        "Pressure": 1.0
+      },
+      "primary_feature": {
+        "name": "anomaly_score",
+        "label": "overall anomaly signal",
+        "z_score": -10.392,
+        "deviation": "below normal"
+      },
+      "feature_attributions": {
+        "messages_per_second": {
+          "label": "CAN message rate",
+          "z_score": 5.355,
+          "healthiness": 0.0322
+        },
+        "unique_can_ids_window": {
+          "label": "CAN ID diversity",
+          "z_score": -2.051,
+          "healthiness": 0.2912
+        },
+        "can_id_entropy": {
+          "label": "CAN identifier entropy",
+          "z_score": -11.005,
+          "healthiness": 0.0007
+        },
+        "message_burst_score": {
+          "label": "message burst activity",
+          "z_score": -2.614,
+          "healthiness": 1.0
+        },
+        "frequency_spike_score": {
+          "label": "timing irregularity",
+          "z_score": -2.183,
+          "healthiness": 1.0
+        },
+        "payload_instability_score": {
+          "label": "payload variation",
+          "z_score": -2.575,
+          "healthiness": 1.0
+        },
+        "anomaly_score": {
+          "label": "overall anomaly signal",
+          "z_score": -10.392,
+          "healthiness": 0.0011
+        }
+      },
+      "root_cause_text": "Attack signature detected. Primary driver: Threat \u2014 overall anomaly signal at -10.4 sigma from normal (below normal). Secondary feature: overall anomaly signal at -10.4 sigma."
+    },
+    "future_risk_forecast": {
+      "horizon_windows": 20,
+      "projected_health": 59.55,
+      "forecast_text": "Critical escalation risk. Health projected at 60/100 in 20 windows \u2014 may cross into Critical range."
+    },
+    "recommended_response": "ACTIVATE COUNTERMEASURES: Isolate suspected ECUs. Enable rate-limiting on CAN bus. Alert fleet operator. Log forensic data for post-incident analysis.",
+    "attack_context": {
+      "attack_type": "Gear",
+      "attack_info": {
+        "attack_type": "Gear Spoofing",
+        "mechanism": "Fabricated gear position messages",
+        "signature": "timing irregularity with payload manipulation",
+        "impact": "erratic transmission behavior, safety risk",
+        "mitigation": "plausibility checks, sensor cross-validation"
+      }
+    },
+    "narrative": "HIGH RISK: Strong indicators of active cyber attack detected. Vehicle cybersecurity is compromised \u2014 immediate attention required. Cyber Health dropped to 33/100 and is improving over the last 10 windows. Primary concern: Threat component (0% of normal). Pattern matches Gear Spoofing attack: timing irregularity with payload manipulation. Impact: erratic transmission behavior, safety risk. Root cause: Attack signature detected. Primary driver: Threat \u2014 overall anomaly signal at -10.4 sigma from normal (below normal). Secondary feature: overall anomaly signal at -10.4 sigma. Critical escalation risk. Health projected at 60/100 in 20 windows \u2014 may cross into Critical range. Recommended: ACTIVATE COUNTERMEASURES: Isolate suspected ECUs. Enable rate-limiting on CAN bus. Alert fleet operator. Log forensic data for post-incident analysis."
+  },
+  "rpm": {
+    "metadata": {
+      "engine": "AutoShield Edge Threat Story Engine v1",
+      "generated_at": "2026-06-23T12:52:27.283313",
+      "window_index": 308662,
+      "window_size": 50
+    },
+    "threat_summary": "HIGH RISK: Strong indicators of active cyber attack detected. Vehicle cybersecurity is compromised \u2014 immediate attention required.",
+    "risk_category": "High Risk",
+    "health_score": 32.46,
+    "trend": {
+      "label": "Improving",
+      "magnitude": 2.82,
+      "description": "Cyber Health dropped to 32/100 and is improving over the last 10 windows. Primary concern: Threat component (0% of normal)."
+    },
+    "root_cause_analysis": {
+      "primary_component": "Threat",
+      "component_breakdown": {
+        "Threat": 0.0015,
+        "Stability": 0.0855,
+        "Pressure": 0.9943
+      },
+      "primary_feature": {
+        "name": "anomaly_score",
+        "label": "overall anomaly signal",
+        "z_score": -9.939,
+        "deviation": "below normal"
+      },
+      "feature_attributions": {
+        "messages_per_second": {
+          "label": "CAN message rate",
+          "z_score": 3.741,
+          "healthiness": 0.0944
+        },
+        "unique_can_ids_window": {
+          "label": "CAN ID diversity",
+          "z_score": -2.93,
+          "healthiness": 0.162
+        },
+        "can_id_entropy": {
+          "label": "CAN identifier entropy",
+          "z_score": -12.76,
+          "healthiness": 0.0002
+        },
+        "message_burst_score": {
+          "label": "message burst activity",
+          "z_score": -1.742,
+          "healthiness": 1.0
+        },
+        "frequency_spike_score": {
+          "label": "timing irregularity",
+          "z_score": -1.481,
+          "healthiness": 1.0
+        },
+        "payload_instability_score": {
+          "label": "payload variation",
+          "z_score": 0.226,
+          "healthiness": 0.9829
+        },
+        "anomaly_score": {
+          "label": "overall anomaly signal",
+          "z_score": -9.939,
+          "healthiness": 0.0015
+        }
+      },
+      "root_cause_text": "Attack signature detected. Primary driver: Threat \u2014 overall anomaly signal at -9.9 sigma from normal (below normal). Secondary feature: overall anomaly signal at -9.9 sigma."
+    },
+    "future_risk_forecast": {
+      "horizon_windows": 20,
+      "projected_health": 63.27,
+      "forecast_text": "Critical escalation risk. Health projected at 63/100 in 20 windows \u2014 may cross into Critical range."
+    },
+    "recommended_response": "ACTIVATE COUNTERMEASURES: Isolate suspected ECUs. Enable rate-limiting on CAN bus. Alert fleet operator. Log forensic data for post-incident analysis.",
+    "attack_context": {
+      "attack_type": "RPM",
+      "attack_info": {
+        "attack_type": "RPM Spoofing",
+        "mechanism": "Fabricated engine RPM messages",
+        "signature": "timing irregularity with payload manipulation",
+        "impact": "erratic engine control, safety risk",
+        "mitigation": "plausibility checks, sensor cross-validation"
+      }
+    },
+    "narrative": "HIGH RISK: Strong indicators of active cyber attack detected. Vehicle cybersecurity is compromised \u2014 immediate attention required. Cyber Health dropped to 32/100 and is improving over the last 10 windows. Primary concern: Threat component (0% of normal). Pattern matches RPM Spoofing attack: timing irregularity with payload manipulation. Impact: erratic engine control, safety risk. Root cause: Attack signature detected. Primary driver: Threat \u2014 overall anomaly signal at -9.9 sigma from normal (below normal). Secondary feature: overall anomaly signal at -9.9 sigma. Critical escalation risk. Health projected at 63/100 in 20 windows \u2014 may cross into Critical range. Recommended: ACTIVATE COUNTERMEASURES: Isolate suspected ECUs. Enable rate-limiting on CAN bus. Alert fleet operator. Log forensic data for post-incident analysis."
+  }
+}
