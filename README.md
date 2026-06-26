@@ -2,7 +2,7 @@
 
 **An Explainable, Predictive and Self-Healing Vehicle Cyber Immune System Powered by Edge AI**
 
-> **Theme:** AI at the Edge Solutions for Automotive  
+> **Theme:** AI at the Edge Solutions for Automotive 
 > **Subtheme:** Edge AI for Automotive Cybersecurity
 
 ---
