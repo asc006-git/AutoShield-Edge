@@ -7,6 +7,9 @@ interface CyberHealthGaugeProps {
   size?: number
   showDetails?: boolean
   animated?: boolean
+  threatComponent?: number
+  stabilityComponent?: number
+  pressureComponent?: number
 }
 
 function polarToCartesian(cx: number, cy: number, r: number, angleDeg: number) {
@@ -37,6 +40,9 @@ export default function CyberHealthGauge({
   size = 200,
   showDetails = true,
   animated = true,
+  threatComponent,
+  stabilityComponent,
+  pressureComponent,
 }: CyberHealthGaugeProps) {
   const clampedScore = Math.max(0, Math.min(100, score))
   const cx = size / 2
@@ -89,15 +95,15 @@ export default function CyberHealthGauge({
   const breakdownItems = [
     {
       label: 'Threat',
-      value: Math.round(Math.max(0, Math.min(100, 100 - clampedScore * 0.85 + 5))),
+      value: threatComponent ?? Math.round(Math.max(0, Math.min(100, 100 - clampedScore * 0.85 + 5))),
     },
     {
       label: 'Stability',
-      value: Math.round(Math.max(0, Math.min(100, clampedScore * 0.9 + 5))),
+      value: stabilityComponent ?? Math.round(Math.max(0, Math.min(100, clampedScore * 0.9 + 5))),
     },
     {
       label: 'Pressure',
-      value: Math.round(Math.max(0, Math.min(100, 100 - clampedScore * 0.75))),
+      value: pressureComponent ?? Math.round(Math.max(0, Math.min(100, 100 - clampedScore * 0.75))),
     },
   ]
 

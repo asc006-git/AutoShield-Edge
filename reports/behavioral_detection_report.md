@@ -54,7 +54,7 @@ This report evaluates three one-class anomaly detectors trained exclusively on *
 
 | Detection_Rate | 0.4666 | 0.6810 | 0.6893 |
 
-| Train_Time_s | 7.3000 | 208.7000 | 32.0000 |
+| Train_Time_s | 4.4000 | 36.1000 | 4.1000 |
 
 
 ## 5. Confusion Matrices
@@ -154,7 +154,7 @@ This report evaluates three one-class anomaly detectors trained exclusively on *
 
 - **False Positive Rate**: 0.0500
 
-- **Training Time**: 32.0s
+- **Training Time**: 4.1s
 
 
 **Suitability**: **Production-ready** with threshold tuning
