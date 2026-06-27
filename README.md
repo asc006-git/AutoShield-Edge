@@ -1,612 +1,1548 @@
+<div align="center">
+
 # AutoShield Edge
 
-**Behavioral Cyber Twin for Connected Vehicles**
+### Behavioral Cyber Twin for Connected Vehicle Cybersecurity
 
-<<<<<<< HEAD
-> **Theme:** AI at the Edge Solutions for Automotive 
-> **Subtheme:** Edge AI for Automotive Cybersecurity
-=======
-[![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-teal)](https://fastapi.tiangolo.com/)
-[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
-[![scikit-learn](https://img.shields.io/badge/scikit--learn-1.5-orange)](https://scikit-learn.org/)
-[![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
+AI at the Edge Solution for Automotive Cybersecurity
 
-AutoShield Edge is an edge-AI cyber immune system for connected vehicles. It uses a Behavioral Cyber Twin — a real-time digital replica of CAN bus communication patterns — to detect zero-day cyber attacks with explainable AI, assess vehicle cyber health, and deploy autonomous self-healing countermeasures.
+</div>
 
 ---
 
-## Table of Contents
+<div align="center">
 
-- [Overview](#overview)
-- [Problem Statement](#problem-statement)
-- [Solution](#solution)
-- [Key Features](#key-features)
-- [AI Pipeline](#ai-pipeline)
-- [System Workflow](#system-workflow)
-- [Architecture Overview](#architecture-overview)
-- [Technology Stack](#technology-stack)
-- [Backend Architecture](#backend-architecture)
-- [Frontend Architecture](#frontend-architecture)
-- [Machine Learning Methodology](#machine-learning-methodology)
-- [Supported Attack Types](#supported-attack-types)
-- [Pipeline Stages](#pipeline-stages)
-- [API Overview](#api-overview)
-- [Project Structure](#project-structure)
-- [Screenshots](#screenshots)
-- [Setup Instructions](#setup-instructions)
-- [Usage Guide](#usage-guide)
-- [Datasets](#datasets)
-- [Trained Model](#trained-model)
-- [Evaluation Metrics](#evaluation-metrics)
-- [Achievements](#achievements)
-- [Limitations](#limitations)
-- [Future Improvements](#future-improvements)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Release%20Candidate-success?style=flat-square)
+
+</div>
 
 ---
 
-## Overview
+# Table of Contents
 
-Modern vehicles contain 100+ million lines of code across 70+ Electronic Control Units (ECUs) connected by internal Controller Area Network (CAN) buses. These networks lack basic security controls — no encryption, no authentication, no integrity checks. A single compromised ECU can send forged CAN messages to disable brakes, manipulate steering, or override engine controls.
-
-AutoShield Edge addresses this by deploying a **Behavioral Cyber Twin** — a real-time machine learning model that learns the normal communication patterns of each vehicle and flags deviations indicative of cyber attacks. The system:
-
-- Processes CAN bus messages into behavioral windows
-- Extracts 13 statistical features per window
-- Runs inference through a One-Class SVM (OC-SVM) trained exclusively on normal driving data
-- Computes a 0–100 Cyber Health Score from anomaly signals
-- Generates explainable feature attributions for each detection
-- Produces human-readable threat narratives with root cause analysis
-- Deploys autonomous defense actions across 5 response levels
-- Recovers vehicle systems and verifies post-mitigation integrity
-
-All inference runs on the edge with no runtime training — the model is pre-trained offline and loaded at startup.
->>>>>>> 7134c19 (RC: restore all visualizations, reports, documentation; fix gitignore; add smoke tests)
-
----
-
-## Problem Statement
-
-- **CAN buses have no built-in security** — no encryption, authentication, or access control
-- **100M+ lines of code** across 70+ ECUs create an enormous attack surface
-- **Signature-based IDS** cannot detect zero-day or novel attacks
-- **Centralized cloud detection** introduces latency and connectivity dependency
-- **Existing ML-based approaches** lack explainability and autonomous response
-- **17.5M CAN messages** in the benchmark dataset demonstrate the data volume challenge
+- Overview
+- Problem Statement
+- Existing Challenges
+- Proposed Solution
+- Key Features
+- System Architecture
+- Behavioral Cyber Twin
+- Nine-Stage AI Pipeline
+- Technology Stack
+- Repository Structure
+- Dataset
+- Feature Engineering
+- Machine Learning Pipeline
+- Backend Architecture
+- Frontend Demonstration
+- API Overview
+- Experimental Results
+- Installation
+- Usage
+- Future Scope
+- Project Highlights
 
 ---
 
-## Solution
+# Overview
 
-AutoShield Edge provides an **edge-native, explainable, and autonomous** defense pipeline:
+AutoShield Edge is an Edge AI powered automotive cybersecurity platform designed to detect, explain, and autonomously respond to cyber attacks targeting connected vehicles.
 
-| Capability | Approach |
-|---|---|
-| **Zero-day detection** | One-class anomaly detection (unsupervised) |
-| **Explainability** | Per-feature z-score attribution per window |
-| **Cyber health** | 0–100 composite score with trend forecasting |
-| **Threat narrative** | Rule-based story generation with root cause |
-| **Autonomous response** | 5-level defense agent with targeted playbooks |
-| **Edge deployment** | Inference-only backend, no runtime training |
+Unlike traditional signature-based Intrusion Detection Systems (IDS), AutoShield Edge learns the normal behavioural characteristics of vehicle communication over the Controller Area Network (CAN Bus). Any deviation from this learned behavioural profile is treated as a potential cyber attack, enabling the system to identify both known and previously unseen threats.
+
+The project introduces the concept of a **Behavioral Cyber Twin**, a virtual behavioural representation of the vehicle that continuously monitors communication patterns, evaluates cybersecurity health, explains attack causes, and recommends or executes appropriate defensive actions.
+
+The complete solution consists of a FastAPI backend implementing the behavioural AI pipeline and a Next.js frontend that demonstrates the entire detection and response workflow in an interactive manner.
 
 ---
 
-## Key Features
+# Problem Statement
 
-- **Behavioral Cyber Twin**: Rolling-window digital replica of CAN bus behavior (13 features, W=50)
-- **Zero-Shot Anomaly Detection**: One-Class SVM trained only on normal data — detects any unseen attack pattern
-- **Cyber Health Score Engine**: 0–100 continuous health score with 3 components (Threat, Stability, Pressure)
-- **Feature Attribution Engine**: Per-instance explainability via z-score deviation analysis
-- **Threat Story Engine**: Human-readable narratives with root cause attribution and impact assessment
-- **Autonomous Defense Agent**: 5-level response (Monitor → Alert → Contain → Mitigate → Emergency)
-- **Real-Time Dashboard**: Next.js frontend with live SSE streaming of all 9 pipeline stages
-- **Inference-Only Backend**: OC-SVM model loaded at startup; no runtime training
+Modern vehicles have evolved into highly connected cyber-physical systems.
 
----
+A typical vehicle contains between **50 and 100 Electronic Control Units (ECUs)** responsible for steering, braking, engine control, transmission, infotainment, Advanced Driver Assistance Systems (ADAS), and numerous safety-critical functions.
 
-## AI Pipeline
+These ECUs communicate through the **Controller Area Network (CAN Bus)**.
 
-```
-CAN Messages (17.5M)
-    │
-    ▼
-┌─────────────────────────────────────────────────────┐
-│          OFFLINE PREPROCESSING & TRAINING            │
-│                                                     │
-│  Raw CAN CSV/TXT → Preprocessing (19 features)      │
-│  → Behavioral Windowing (W=50, 13 features)         │
-│  → OC-SVM Training (normal data only)               │
-│  → Save model to data/models/ocsvm_model.joblib     │
-└─────────────────────────────────────────────────────┘
-    │ (model + data loaded at startup)
-    ▼
-┌─────────────────────────────────────────────────────┐
-│          RUNTIME INFERENCE PIPELINE                  │
-│                                                     │
-│  1. Data Acquisition     → Load behavioral windows   │
-│  2. Sliding Window       → Segment into W=50 frames  │
-│  3. Feature Extraction   → Compute 13 features       │
-│  4. Threat Detection     → OC-SVM anomaly score      │
-│  5. Cyber Health Score   → 0–100 composite score     │
-│  6. Feature Attribution  → Z-score contributions     │
-│  7. Threat Story         → Narrative + root cause    │
-│  8. Defense Agent        → 5-level response          │
-│  9. Vehicle Recovery     → Health restoration        │
-└─────────────────────────────────────────────────────┘
-    │ (SSE streamed to frontend)
-    ▼
-            Next.js Dashboard
-```
+Although CAN Bus is lightweight and efficient, it was originally designed without cybersecurity mechanisms such as:
+
+- Message authentication
+- Encryption
+- Device identity verification
+- Access control
+- Confidential communication
+
+As a result, if an attacker gains access to the vehicle network through compromised ECUs, diagnostic ports, infotainment systems, wireless interfaces, or aftermarket devices, malicious CAN frames can be injected into the network without being rejected.
+
+Successful attacks can manipulate vehicle behaviour by transmitting forged messages that appear legitimate to other ECUs.
+
+Examples include:
+
+- Denial of Service attacks that flood the CAN Bus
+- Fuzzy attacks that inject random CAN identifiers
+- Gear spoofing attacks
+- RPM spoofing attacks
+- Sensor manipulation attacks
+- Replay attacks
+- ECU impersonation attacks
+
+Because these messages often follow valid CAN formats, conventional security solutions struggle to distinguish malicious communication from legitimate traffic.
 
 ---
 
-## System Workflow
+# Existing Challenges
 
-1. **User selects an attack scenario** from 5 options (Normal, DoS Flood, Fuzzing, Gear Spoof, RPM Spoof)
-2. **Backend executes the 9-stage pipeline** using real precomputed behavioral data and the loaded OC-SVM model
-3. **SSE streams each stage** with execution metadata, logs, and computed values
-4. **Frontend renders each stage** as it arrives — timeline, content panel, log console
-5. **Summary aggregates all stages** into an execution flow graph with health delta metrics
+Current automotive Intrusion Detection Systems primarily rely on one or more of the following approaches:
 
----
+- Signature-based detection
+- Rule-based detection
+- Static threshold monitoring
+- Message frequency analysis
+- Blacklisted CAN identifiers
 
-## Architecture Overview
+Although effective against previously known attacks, these approaches have significant limitations.
 
-```
-┌──────────────┐       SSE Streaming        ┌──────────────┐
-│   FastAPI    │ ◄──────────────────────►   │   Next.js    │
-│   Backend    │    POST /api/pipeline/run   │   Frontend   │
-│   :8000      │    GET  /api/health         │   :3000      │
-│              │    GET  /api/stats          │              │
-└──────┬───────┘                             └──────────────┘
-       │
-       ▼
-┌──────────────┐
-│  Data Layer  │
-│  ─────────── │
-│  behavioral/ │  ← 5 parquet files (W=50)
-│  models/     │  ← ocsvm_model.joblib + scaler.joblib
-└──────────────┘
-```
+<div align="center">
 
----
+| Existing Approach | Limitation |
+|:-----------------:|:----------:|
+| Signature-based IDS | Cannot detect zero-day attacks |
+| Rule-based systems | Require continuous manual updates |
+| Threshold monitoring | Produces high false positives |
+| CAN ID filtering | Fails against spoofed legitimate identifiers |
+| Payload inspection | Cannot understand behavioural context |
 
-## Technology Stack
+</div>
 
-| Layer | Technology |
-|---|---|
-| **Backend Framework** | FastAPI 0.115 (Python 3.11) |
-| **Model** | One-Class SVM (scikit-learn 1.5) |
-| **Data Processing** | pandas 2.2, NumPy 1.26, pyarrow 17 |
-| **API Server** | Uvicorn 0.30 |
-| **Frontend Framework** | Next.js 16 (TypeScript 5) |
-| **UI Library** | React 19, Framer Motion 12 |
-| **Icons** | Lucide React 1.21 |
-| **Styling** | Tailwind CSS 4 |
-| **Serialization** | Joblib (model), parquet (data) |
+The most significant limitation is that existing systems analyse CAN messages independently.
+
+However, cyber attacks often emerge as **behavioural changes across sequences of messages** rather than abnormalities within a single CAN frame.
+
+This creates a need for behavioural intelligence instead of message-level inspection.
 
 ---
 
-## Backend Architecture
+# Proposed Solution
 
-The backend (`src/api/main.py`) is a single-file FastAPI application that:
+AutoShield Edge addresses these limitations through a Behavioural Cyber Twin architecture.
 
-1. **Loads data at startup**: Reads 5 behavioral parquet files (normal, dos, fuzzy, gear, rpm × W=50)
-2. **Loads pre-trained model**: Deserializes OC-SVM from `data/models/ocsvm_model.joblib`
-3. **Executes inference**: `decision_function()` on all loaded data
-4. **Computes health scores**: Exponential z-score decay formula with 3 components
-5. **Streams pipeline results**: SSE with per-stage metadata and timing
-6. **Falls back to precomputed stories/actions**: `reports/threat_stories.json` and `reports/response_history.json`
+Instead of analysing every CAN frame independently, the system observes communication over behavioural windows and learns how a healthy vehicle normally behaves.
 
-### Key Modules
+The proposed workflow consists of:
 
-| Module | Path | Purpose |
-|---|---|---|
-| `CyberHealthEngine` | `src/cyber_health/cyber_health_engine.py` | 0–100 health scoring with trend/forecast |
-| `ThreatStoryEngine` | `src/threat_explanation/threat_story_engine.py` | Rule-based narrative generation |
-| `SelfHealingAgent` | `src/response_agent/self_healing_agent.py` | 5-level autonomous defense agent |
+1. Capturing CAN Bus traffic.
+2. Creating behavioural windows from consecutive CAN messages.
+3. Extracting behavioural features describing communication patterns.
+4. Detecting anomalies using One-Class Machine Learning.
+5. Computing a Vehicle Cyber Health Score.
+6. Explaining the reason behind every detected anomaly.
+7. Generating an understandable Threat Story.
+8. Executing an appropriate self-healing response.
+9. Monitoring recovery and restoring secure operation.
+
+This architecture enables the system to detect behavioural deviations rather than relying solely on predefined attack signatures, allowing the identification of previously unseen attack patterns while maintaining explainability throughout the detection pipeline.
 
 ---
 
-## Frontend Architecture
+# Key Features
 
-The dashboard is a Next.js 16 app with React 19, organized as:
+- Behavioral Cyber Twin Architecture
+- Behavioural Window-Based Analysis
+- One-Class Machine Learning for Zero-Day Detection
+- Multi-Model Behavioural Threat Detection
+- Vehicle Cyber Health Score (0–100)
+- Explainable Threat Story Engine
+- Self-Healing Response Agent
+- Interactive End-to-End Demonstration
+- FastAPI Inference Backend
+- Next.js Visualization Dashboard
+- Real-Time Pipeline Execution
+- Explainable AI Driven Decision Making
 
-```
-dashboard/src/
-├── app/                     # Next.js App Router
-│   ├── layout.tsx           # Root layout + PipelineProvider
-│   ├── page.tsx             # Entry point with ErrorBoundary
-│   └── globals.css          # Global styles + Tailwind theme
-├── components/              # React components
-│   ├── DemonstrationApp.tsx  # Root orchestrator with header/nav
-│   ├── LandingPage.tsx       # Landing page with stats + attack picker
-│   ├── PipelinePage.tsx      # 9-stage pipeline demo with timeline
-│   ├── CyberHealthGauge.tsx  # SVG arc gauge for health score
-│   ├── GlassCard.tsx         # Reusable glassmorphism card
-│   └── ErrorBoundary.tsx     # Render error recovery
-├── constants/
-│   └── attacks.ts           # Shared attack definitions
-└── context/
-    └── PipelineContext.tsx   # Global state + SSE streaming + API calls
+---
+
+# System Architecture
+
+AutoShield Edge follows a layered Edge AI architecture where every layer has a specific responsibility in the cybersecurity pipeline. Instead of treating intrusion detection as a single classification task, the system decomposes the complete problem into multiple explainable stages that progressively transform raw CAN messages into cybersecurity decisions.
+
+The architecture is divided into five major layers:
+
+1. Data Acquisition Layer
+2. Behavioral Intelligence Layer
+3. AI Detection Layer
+4. Explainability Layer
+5. Autonomous Defense Layer
+
+Each layer contributes information to the next while maintaining complete traceability of every decision generated by the system.
+
+---
+
+# High-Level Architecture
+
+```text
+                    Connected Vehicle
+                           │
+                    CAN Bus Messages
+                           │
+                           ▼
+             Data Acquisition & Preprocessing
+                           │
+                           ▼
+                Behavioral Cyber Twin
+                           │
+                           ▼
+              Behavioral Feature Extraction
+                           │
+                           ▼
+              One-Class AI Threat Detector
+                           │
+                           ▼
+               Vehicle Cyber Health Engine
+                           │
+                           ▼
+            Explainable Threat Story Engine
+                           │
+                           ▼
+             Self-Healing Response Agent
+                           │
+                           ▼
+             Recovery & Continuous Monitoring
 ```
 
 ---
 
-## Machine Learning Methodology
+# Behavioral Cyber Twin
 
-### Model: One-Class SVM
+The core innovation of AutoShield Edge is the **Behavioral Cyber Twin**.
 
-- **Algorithm**: `OneClassSVM(nu=0.01, kernel='rbf', gamma='scale')`
-- **Training data**: 19,777 normal driving behavioral windows (W=50)
-- **Test data**: 351,166 windows (19,777 normal + 331,389 attack)
-- **Features**: 13 behavioral features across 5 categories
-- **Threshold**: 5th percentile of training decision function scores
+Unlike a conventional Digital Twin that attempts to replicate the physical state of a vehicle, a Behavioral Cyber Twin models how the vehicle communicates over time.
 
-### Feature Categories
+Instead of learning the physical properties of components, it learns behavioural characteristics such as:
 
-| Category | Features |
-|---|---|
-| Communication Rate | `messages_per_second` |
-| CAN Diversity | `unique_can_ids_window`, `can_id_entropy` |
-| Timing | `window_delta_time_mean`, `window_delta_time_std`, `window_delta_time_min`, `window_delta_time_max` |
-| Payload | `window_payload_mean`, `window_payload_std`, `window_payload_entropy_mean` |
-| Attack Pressure | `message_burst_score`, `frequency_spike_score`, `payload_instability_score` |
+- Communication frequency
+- CAN ID diversity
+- Payload behaviour
+- Timing characteristics
+- ECU interaction patterns
+- Network stability
+- Attack pressure indicators
 
-### Cyber Health Formula
+The Cyber Twin continuously compares current vehicle behaviour with the learned baseline of healthy communication.
 
+Whenever behavioural deviations exceed acceptable limits, the Cyber Twin generates evidence for downstream AI modules.
+
+The Cyber Twin therefore acts as the behavioural brain of the cybersecurity system rather than merely collecting telemetry.
+
+---
+
+# Why Behavioral Intelligence?
+
+Traditional Intrusion Detection Systems analyse individual CAN frames independently.
+
+However, many automotive cyber attacks are not distinguishable at the message level.
+
+For example:
+
+- A Gear Spoofing attack may transmit perfectly valid CAN frames.
+- An RPM Spoofing attack often produces payloads that appear statistically normal.
+- Replay attacks simply repeat legitimate messages.
+- ECU impersonation uses existing CAN identifiers.
+
+Although individual messages appear normal, their collective behaviour over time changes significantly.
+
+AutoShield Edge therefore analyses **behavioural windows** rather than isolated CAN messages.
+
+Instead of asking:
+
+> "Is this CAN frame malicious?"
+
+the system asks:
+
+> "Is the overall behaviour of the vehicle still consistent with normal operation?"
+
+This behavioural perspective enables detection of attacks that traditional message-level inspection cannot identify.
+
+---
+
+# Layer 1 — Data Acquisition Layer
+
+The first layer receives raw CAN Bus communication from the connected vehicle.
+
+Each CAN frame contains:
+
+- Timestamp
+- CAN Identifier
+- Data Length Code (DLC)
+- Payload Bytes (D0–D7)
+
+Raw communication is collected without modifying the original packet sequence.
+
+The preprocessing engine then performs:
+
+- Dataset normalization
+- Hexadecimal to integer conversion
+- Missing payload handling
+- Label generation
+- Temporal ordering
+- Feature preparation
+
+The resulting data becomes suitable for behavioural analysis.
+
+---
+
+# Layer 2 — Behavioral Intelligence Layer
+
+The Behavioral Intelligence Layer transforms millions of individual CAN messages into behavioural windows.
+
+Instead of analysing every frame independently, consecutive messages are grouped together.
+
+For the final implementation, a window size of **50 CAN messages** is used because it provides the best balance between:
+
+- Detection accuracy
+- Noise reduction
+- Computational efficiency
+- Edge deployment latency
+
+For every behavioural window, the system extracts behavioural descriptors representing the communication characteristics of the vehicle.
+
+This significantly reduces data dimensionality while preserving behavioural information necessary for anomaly detection.
+
+---
+
+# Layer 3 — AI Threat Detection Layer
+
+The extracted behavioural features are forwarded to the Behavioural Threat Detection Engine.
+
+The engine follows a one-class anomaly detection paradigm.
+
+Instead of learning attacks, the model learns only healthy vehicle behaviour.
+
+During inference, every behavioural window receives:
+
+- An anomaly score
+- Confidence score
+- Threat classification
+
+Multiple behavioural models were evaluated during experimentation:
+
+<div align="center">
+
+| Model | Purpose |
+|:------:|:-------:|
+| Isolation Forest | Baseline behavioural detector |
+| Local Outlier Factor | Local density anomaly detection |
+| One-Class SVM | Final production model |
+
+</div>
+
+Experimental evaluation demonstrated that One-Class SVM achieved the best overall balance between precision and recall, making it the selected inference engine.
+
+---
+
+# Layer 4 — Explainability Layer
+
+Detection alone is insufficient in safety-critical automotive systems.
+
+Engineers and drivers must understand **why** a decision was made.
+
+The Explainability Layer transforms raw model outputs into human-understandable reasoning.
+
+This layer consists of three major components.
+
+### Vehicle Cyber Health Engine
+
+Converts anomaly measurements into a normalized cybersecurity health score ranging from 0 to 100.
+
+The score combines:
+
+- Threat Component
+- Behavioural Stability Component
+- Attack Pressure Component
+
+This enables cybersecurity status to be interpreted similarly to battery health or engine health.
+
+---
+
+### Threat Story Engine
+
+The Threat Story Engine converts numerical AI outputs into structured explanations.
+
+Instead of displaying probabilities alone, it produces narratives describing:
+
+- What happened
+- Why it happened
+- Which features contributed
+- Expected consequences
+- Recommended actions
+
+This allows engineers to interpret model decisions without analysing raw machine learning outputs.
+
+---
+
+### Root Cause Attribution
+
+For every detected anomaly, the explainability engine identifies the behavioural features that contributed most strongly to the final prediction.
+
+Examples include:
+
+- Excessive CAN ID diversity
+- Increased communication burst rate
+- Payload instability
+- Timing irregularities
+- Network entropy changes
+
+This attribution improves transparency and simplifies incident investigation.
+
+---
+
+# Layer 5 — Autonomous Defense Layer
+
+After an attack has been detected and explained, the Self-Healing Response Agent determines the appropriate mitigation strategy.
+
+The response engine considers:
+
+- Threat severity
+- Cyber Health Score
+- Behavioural trend
+- Forecasted degradation
+- Detected attack type
+
+Based on these factors, it selects one of five response levels.
+
+<div align="center">
+
+| Response Level | Action |
+|:--------------:|:------:|
+| Level 0 | Passive Monitoring |
+| Level 1 | Warning |
+| Level 2 | Containment |
+| Level 3 | Critical Protection |
+| Level 4 | Emergency Response |
+
+</div>
+
+Each response level activates predefined defensive playbooks designed specifically for different automotive cyber attacks.
+
+The objective is not only to detect attacks but also to reduce their operational impact while maintaining vehicle safety.
+
+---
+
+# End-to-End Processing Pipeline
+
+The complete AutoShield Edge workflow consists of nine sequential stages.
+
+```text
+Stage 1
+Vehicle CAN Communication
+        │
+        ▼
+Stage 2
+Behavioral Window Generation
+        │
+        ▼
+Stage 3
+Behavioral Feature Extraction
+        │
+        ▼
+Stage 4
+Behavioral Threat Detection
+        │
+        ▼
+Stage 5
+Vehicle Cyber Health Score
+        │
+        ▼
+Stage 6
+Explainable AI Analysis
+        │
+        ▼
+Stage 7
+Threat Story Generation
+        │
+        ▼
+Stage 8
+Self-Healing Response
+        │
+        ▼
+Stage 9
+Recovery Monitoring
 ```
-Health = Threat Component (40 pts)
-       + Stability Component (30 pts)
-       + Pressure Component (30 pts)
 
-Each component = exponential decay of z-score deviation
-               from learned normal baselines
-```
+Each stage receives the outputs of the previous stage, ensuring complete traceability from raw CAN communication to the final cybersecurity decision.
+
+The modular design allows future integration of additional detection models, response strategies, or hardware interfaces without modifying the remaining pipeline.
 
 ---
 
-## Supported Attack Types
+# Technology Stack
 
-| Attack | ID | Description | Target ECU |
-|---|---|---|---|
-| Normal Driving | `normal` | Baseline nominal traffic | None |
-| DoS Flood | `dos` | CAN gateway saturation | Central Gateway (0x0A) |
-| Fuzzing | `fuzzy` | Payload byte injection | ABS Module (0x32) |
-| Gear Spoofing | `gear` | TCU signal manipulation | Transmission Control (0x1A) |
-| RPM Spoofing | `rpm` | ECU velocity override | Engine Control (0x12) |
+AutoShield Edge combines modern Edge AI, Machine Learning, Backend Engineering, and Interactive Visualization technologies to build an end-to-end automotive cybersecurity platform.
 
----
+<div align="center">
 
-## Pipeline Stages
+| Layer | Technologies |
+|:------:|:------------|
+| Programming Language | Python 3.11, TypeScript |
+| Frontend | Next.js 16, React 19, Tailwind CSS, Framer Motion |
+| Backend | FastAPI, Uvicorn |
+| Machine Learning | Scikit-learn |
+| Data Processing | Pandas, NumPy, PyArrow |
+| Visualization | Matplotlib |
+| API Communication | REST API, JSON |
+| Model | One-Class SVM, Isolation Forest, Local Outlier Factor |
+| Storage | Parquet Dataset Format |
+| Version Control | Git, GitHub |
 
-### Stage 1: Data Acquisition
-Load behavioral window dataset from parquet files. Identify attack-type-specific windows.
-
-### Stage 2: Sliding Window Segmentation
-Segment CAN message streams into non-overlapping windows of W=50 frames to capture temporal behavioral patterns.
-
-### Stage 3: Behavioral Feature Extraction
-Compute 13 statistical features per window across 5 behavioral dimensions: communication rate, CAN ID diversity, timing regularity, payload statistics, and attack pressure.
-
-### Stage 4: AI Threat Detection Engine
-Run the OC-SVM model inference — measures how far each window's feature vector deviates from the learned normal boundary. Windows below the 5th percentile threshold are flagged as anomalies.
-
-### Stage 5: Cyber Health Score Engine
-Compute a 0–100 health score from three components: threat severity (anomaly score), behavioral stability (CAN diversity + timing), and attack pressure (burst + frequency intensity).
-
-### Stage 6: Feature Attribution Engine
-Analyze z-score deviations of each feature from learned normal baselines to identify which behavioral signals most contribute to the anomaly classification.
-
-### Stage 7: Explainable Threat Story
-Generate a human-readable narrative with root cause attribution, risk category, impact assessment, and recommended response actions.
-
-### Stage 8: Autonomous Defense Agent
-Select and deploy a response level (0–4) based on attack severity, affected ECU criticality, and current vehicle state. Executes targeted mitigation actions.
-
-### Stage 9: Vehicle Recovery & Stabilization
-Compute health recovery trajectory, verify all ECUs return to secure state, and report end-to-end mitigation latency.
+</div>
 
 ---
 
-## API Overview
+# Repository Structure
 
-| Method | Path | Description |
-|---|---|---|
-| `GET` | `/api/health` | Backend health check |
-| `GET` | `/api/stats` | Model statistics (F1, latency, reduction) |
-| `GET` | `/api/telemetry` | Runtime telemetry (CAN rate, CPU, latency) |
-| `GET` | `/api/cyber-health` | Current cyber health score + forecast |
-| `GET` | `/api/cyber-health/history` | Sampled health score history |
-| `GET` | `/api/detection/models` | Precomputed model metrics |
-| `GET` | `/api/detection/per-attack` | Per-attack health statistics |
-| `GET` | `/api/detection/features` | Feature importance ranking |
-| `GET` | `/api/twin/status` | Digital twin baseline metrics |
-| `GET` | `/api/twin/ecus` | ECU status definitions |
-| `GET` | `/api/story` | Single threat story |
-| `GET` | `/api/stories` | All 5 threat stories |
-| `GET` | `/api/defense` | Current defense level status |
-| `POST` | `/api/defense/respond` | Execute defense for attack type |
-| `GET` | `/api/system/architecture` | Pipeline phase descriptions |
-| `POST` | `/api/pipeline/run` | **Execute full pipeline (SSE)** |
-| `GET` | `/api/performance/metrics` | Detailed model comparison metrics |
+The repository is organized into independent modules so that each component of the cybersecurity pipeline can evolve without affecting the remaining system.
 
----
-
-## Project Structure
-
-```
-AutoShield-Edge/
-├── assets/                       # Generated evaluation visualizations (9 PNG files)
-├── dashboard/                    # Next.js 16 frontend
-│   ├── src/
-│   │   ├── app/                  # App Router pages + layout
-│   │   ├── components/           # 6 React components
-│   │   ├── constants/            # Shared attack definitions
-│   │   └── context/              # Pipeline context + SSE streaming
-│   ├── next.config.ts
-│   ├── package.json
-│   └── tsconfig.json
+```text
+AutoShield-Edge
+│
+├── assets/
+│   ├── Generated graphs
+│   ├── Performance plots
+│   └── Evaluation figures
+│
+├── dashboard/
+│   ├── Next.js frontend
+│   ├── React components
+│   ├── API integration
+│   └── Interactive demonstration
+│
 ├── data/
-│   ├── behavioral/               # 5 behavioral window parquet files (W=50)
-│   └── models/                   # Trained OC-SVM model + StandardScaler
+│   ├── Behavioral windows
+│   └── Processed datasets
+│
+├── dataset/
+│   ├── Normal CAN traffic
+│   ├── DoS attack
+│   ├── Fuzzy attack
+│   ├── Gear attack
+│   └── RPM attack
+│
 ├── reports/
-│   ├── *.md                      # 14 evaluation reports (Phases 1-8)
-│   ├── threat_stories.json       # 5 attack threat story examples
-│   └── response_history.json     # 5 defense response decisions
+│   ├── Experimental reports
+│   ├── Performance summaries
+│   └── Evaluation results
+│
 ├── scripts/
-│   └── generate_visualizations.py  # Evaluation figure generator
+│   ├── Dataset utilities
+│   └── Analysis scripts
+│
 ├── src/
 │   ├── api/
-│   │   ├── main.py               # FastAPI application (17 endpoints, 1500 lines)
-│   │   ├── requirements.txt      # Python dependencies
-│   │   └── test_api.py           # 9 pytest smoke tests
+│   ├── preprocessing/
+│   ├── anomaly_detection/
 │   ├── cyber_health/
-│   │   ├── __init__.py
-│   │   └── cyber_health_engine.py  # 0-100 health scoring engine
-│   ├── response_agent/
-│   │   ├── __init__.py
-│   │   └── self_healing_agent.py   # 5-level autonomous defense
-│   └── threat_explanation/
-│       ├── __init__.py
-│       └── threat_story_engine.py  # Narrative generation engine
-├── .env                          # Environment variables
-├── .env.example                  # Documented environment template
-├── .gitignore
+│   ├── threat_explanation/
+│   └── response_agent/
+│
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## Screenshots
+# Dataset
 
-The following screenshots can be captured from the running application. All images correspond to `assets/*.png` in the repository and frontend views at `http://localhost:3000`.
+AutoShield Edge is evaluated using publicly available automotive CAN Bus intrusion datasets containing both normal driving behaviour and multiple cyber attack scenarios.
 
-### Frontend Views
+The dataset represents communication between Electronic Control Units (ECUs) over the Controller Area Network (CAN Bus).
 
-| View | Description | Location |
-|---|---|---|
-| **Landing Page** | System stats (F1, latency, reduction, CAN rate), 5 attack selectors, 9-phase architecture grid, START button | `http://localhost:3000` |
-| **Attack Selection** | Attack type picker (Normal/DoS/Fuzzy/Gear/RPM) on both Landing and Pipeline pages | Landing page hero area |
-| **Live Pipeline Execution** | 9-stage sequential timeline with animated progress, stage content panel, and log console | Pipeline page during `pipelineStatus === "running"` |
-| **Behavioral Feature Extraction** | Stage 3 — 13 extracted feature values with category groupings | Pipeline stage 3 content panel |
-| **Threat Detection Stage** | Stage 4 — OC-SVM classification result, anomaly score, confidence, model info | Pipeline stage 4 content panel |
-| **Cyber Health Gauge** | Stage 5 — SVG arc gauge (0–100) with Threat/Stability/Pressure breakdown bars | Pipeline stage 5 content panel |
-| **Feature Attribution** | Stage 6 — Per-feature contribution bars with anomalous feature highlighting | Pipeline stage 6 content panel |
-| **Threat Story Generation** | Stage 7 — Full narrative text with risk category and recommended actions | Pipeline stage 7 content panel |
-| **Self-Healing Response** | Stage 8 — Response level badge, autonomous mode indicator, action list | Pipeline stage 8 content panel |
-| **Vehicle Recovery** | Stage 9 — Health delta (Before→During→After), recovery time, ECUs restored | Pipeline stage 9 content panel |
-| **Execution Summary** | Post-pipeline — Flow graph, attack details, anomaly score, confidence, top driver | Pipeline page after completion |
-| **KPI Bar** | Top metrics bar: Cyber Health, ECU Status, Active Threats, Stage progress (with ~Xs remaining) | Pipeline page during execution |
-
-### Generated Evaluation Charts (assets/)
-
-| Image | Description | Source |
-|---|---|---|
-| `assets/model_comparison.png` | F1, Recall, Precision, AUC comparison across IF, LOF, OC-SVM | `scripts/generate_visualizations.py` |
-| `assets/behavioral_confusion_matrix.png` | OC-SVM confusion matrix (351K windows) | `scripts/generate_visualizations.py` |
-| `assets/per_attack_detection_rate.png` | Detection rate per attack type by model | `scripts/generate_visualizations.py` |
-| `assets/feature_importance_proxy.png` | 13 features ranked by z-score deviation importance | `scripts/generate_visualizations.py` |
-| `assets/phase_comparison.png` | Phase 3 → Phase 5 improvement (F1: 0.112 → 0.815) | `scripts/generate_visualizations.py` |
-| `assets/anomaly_score_distribution.png` | Normal vs Attack OC-SVM decision score distributions | `scripts/generate_visualizations.py` |
-| `assets/cyber_health_timeline.png` | 351K-window health score timeline by risk category | `src/cyber_health/cyber_health_engine.py` |
-| `assets/cyber_health_distribution.png` | Health score histogram with category boundaries | `src/cyber_health/cyber_health_engine.py` |
-| `assets/risk_category_distribution.png` | Bar chart: Secure / Stable / Warning / High Risk / Critical | `src/cyber_health/cyber_health_engine.py` |
+The project processes more than **17.5 million CAN messages**, making it suitable for behavioural learning rather than simple message classification.
 
 ---
 
-## Setup Instructions
+## Dataset Summary
 
-### Prerequisites
+<div align="center">
 
-- **Python 3.11+** with `pip`
-- **Node.js 20+** with `npm`
-- **Data files**: Behavioral parquet files (`data/behavioral/*_w50.parquet`) and model files (`data/models/*.joblib`)
+| Dataset | Messages | Description |
+|:--------:|:--------:|:-----------|
+| Normal | 988,871 | Legitimate vehicle communication |
+| DoS | 3,665,771 | CAN Bus flooding attack |
+| Fuzzy | 3,838,860 | Random CAN identifier injection |
+| Gear | 4,443,142 | Gear spoofing attack |
+| RPM | 4,621,702 | RPM spoofing attack |
 
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/asc006-git/AutoShield-Edge.git
-cd AutoShield-Edge
-
-# Create and activate virtual environment
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS/Linux:
-# source .venv/bin/activate
-
-# Install backend dependencies
-pip install -r src/api/requirements.txt
-
-# Install frontend dependencies
-cd dashboard
-npm install
-cd ..
-```
-
-### Backend Startup
-
-```bash
-# From the project root (with venv active):
-python -m src.api.main
-```
-
-The API starts at `http://localhost:8000`. Health check: `http://localhost:8000/api/health`
-
-### Frontend Startup
-
-In a separate terminal:
-
-```bash
-cd dashboard
-npm run dev
-```
-
-The dashboard loads at `http://localhost:3000`. The frontend connects to `http://localhost:8000` by default (configurable via `NEXT_PUBLIC_API_URL` environment variable).
+</div>
 
 ---
 
-## Usage Guide
+## Overall Dataset Statistics
 
-### Demonstration Workflow
-
-1. Open `http://localhost:3000` in a browser
-2. View landing page stats (F1 score, edge latency, data reduction, CAN rate)
-3. Select an attack type (DoS, Fuzzing, Gear Spoof, RPM Spoof, or Normal)
-4. Click **START LIVE DEMONSTRATION**
-5. Watch the 9-stage pipeline execute in real time:
-   - **Timeline** (left): Animated progress through stages
-   - **Stage Content** (center): Purpose, inputs, outputs, AI reasoning, decision, and stage-specific data
-   - **Log Console** (right): Backend execution logs with timestamps
-   - **KPI Bar** (top): Cyber health, ECU status, threat count, stage progress
-6. After all 9 stages complete, review the **Execution Summary** with flow graph and health delta
-
----
-
-## Datasets
-
-The model was trained and evaluated on the **AutoShield Edge CAN Bus Attack Dataset**, which contains 17.5M CAN 2.0B messages across 5 scenarios:
-
-| Dataset | Messages | Label |
-|---|---|---|
-| Normal Driving | 988,871 | Normal |
-| DoS Attack | 3,665,771 | Attack |
-| Fuzzy Attack | 3,838,860 | Attack |
-| Gear Spoofing | 4,443,142 | Attack |
-| RPM Spoofing | 4,621,702 | Attack |
-
-**Preprocessing**: Raw CSV/TXT → 19 per-message features → behavioral windowing (W=50) → 13 window-level features → OC-SVM training/inference.
-
----
-
-## Trained Model
+<div align="center">
 
 | Property | Value |
-|---|---|
-| **Algorithm** | One-Class SVM |
-| **Kernel** | RBF (gamma='scale') |
-| **Nu** | 0.01 |
-| **Training samples** | 19,777 normal windows |
-| **Features** | 13 behavioral features |
-| **Window size** | 50 CAN frames |
-| **Threshold** | 5th percentile of training scores |
-| **Serialization** | Joblib (`data/models/ocsvm_model.joblib`) |
+|:---------:|:-----:|
+| Total CAN Messages | 17,558,346 |
+| Number of Attack Types | 4 |
+| Normal Messages | 988,871 |
+| Attack Messages | 16,569,475 |
+| Total Features After Preprocessing | 19 |
+| Behavioral Window Size | 50 Messages |
+
+</div>
 
 ---
 
-## Evaluation Metrics
+# Data Preprocessing
 
-### Model Comparison (Behavioral Window Features, W=50)
+Before behavioural analysis, every dataset undergoes a standardized preprocessing pipeline.
+
+The preprocessing module performs the following operations:
+
+- Schema normalization
+- Hexadecimal to integer conversion
+- Missing byte handling
+- DLC-based payload correction
+- Timestamp ordering
+- Label generation
+- Feature engineering
+- Parquet conversion
+
+The final processed dataset contains both original CAN information and engineered behavioural descriptors suitable for machine learning.
+
+---
+
+# Feature Engineering
+
+Instead of relying only on raw CAN payloads, AutoShield Edge generates additional behavioural descriptors that capture communication dynamics.
+
+The engineered features are divided into multiple categories.
+
+---
+
+## Raw CAN Features
+
+<div align="center">
+
+| Feature |
+|:--------|
+| Timestamp |
+| CAN ID |
+| DLC |
+| D0 – D7 Payload Bytes |
+
+</div>
+
+---
+
+## Statistical Features
+
+<div align="center">
+
+| Feature | Purpose |
+|:--------:|:-------|
+| Payload Mean | Average payload behaviour |
+| Payload Standard Deviation | Payload variation |
+| Payload Minimum | Minimum byte value |
+| Payload Maximum | Maximum byte value |
+| Payload Entropy | Information randomness |
+
+</div>
+
+---
+
+## Temporal Features
+
+<div align="center">
+
+| Feature | Description |
+|:--------:|:-----------|
+| Delta Time | Time between consecutive CAN messages |
+
+</div>
+
+---
+
+# Behavioral Feature Engineering
+
+The Behavioral Cyber Twin transforms individual CAN frames into behavioural windows.
+
+For each window, thirteen behavioural descriptors are extracted.
+
+These descriptors describe **how the vehicle behaves** instead of **what a single CAN message contains**.
+
+---
+
+## Behavioral Features
+
+<div align="center">
+
+| Category | Features |
+|:---------:|:--------|
+| Communication Rate | Messages per Second |
+| CAN Diversity | Unique CAN IDs |
+| Network Entropy | CAN ID Entropy |
+| Timing Behaviour | Mean Delta Time |
+| Timing Behaviour | Standard Deviation of Delta Time |
+| Timing Behaviour | Minimum Delta Time |
+| Timing Behaviour | Maximum Delta Time |
+| Payload Behaviour | Mean Payload |
+| Payload Behaviour | Payload Standard Deviation |
+| Payload Behaviour | Mean Payload Entropy |
+| Attack Pressure | Message Burst Score |
+| Attack Pressure | Frequency Spike Score |
+| Attack Pressure | Payload Instability Score |
+
+</div>
+
+---
+
+# Why Behavioral Features?
+
+Traditional automotive intrusion detection evaluates one CAN message at a time.
+
+However, many cyber attacks preserve valid message formats while altering communication behaviour.
+
+Behavioural windows reveal information that individual messages cannot provide, including:
+
+- Network congestion
+- Timing anomalies
+- Communication bursts
+- CAN identifier diversity
+- Payload instability
+- Behavioural drift
+
+These characteristics enable the detection of sophisticated attacks that evade message-level inspection.
+
+---
+
+# Machine Learning Pipeline
+
+AutoShield Edge follows a one-class anomaly detection strategy.
+
+Rather than learning examples of attacks, the model learns **normal vehicle behaviour**.
+
+During deployment, any behavioural deviation from this learned baseline is considered suspicious.
+
+The workflow consists of:
+
+```text
+Raw CAN Messages
+        │
+        ▼
+Preprocessing
+        │
+        ▼
+Behavioral Windows
+        │
+        ▼
+Feature Engineering
+        │
+        ▼
+Feature Scaling
+        │
+        ▼
+One-Class Model Training
+        │
+        ▼
+Behavioral Threat Detection
+```
+
+---
+
+# Model Evaluation
+
+Three anomaly detection algorithms were evaluated during experimentation.
+
+<div align="center">
+
+| Model | Objective |
+|:------:|:---------|
+| Isolation Forest | Baseline anomaly detector |
+| Local Outlier Factor | Local density anomaly detection |
+| One-Class SVM | Final production model |
+
+</div>
+
+---
+
+# Performance Comparison
+
+<div align="center">
 
 | Model | Precision | Recall | F1 Score | AUC |
-|---|---|---|---|---|
+|:------:|:---------:|:------:|:--------:|:---:|
 | Isolation Forest | 0.9936 | 0.4666 | 0.6350 | 0.8371 |
 | Local Outlier Factor | 0.9956 | 0.6810 | 0.8088 | 0.9055 |
 | **One-Class SVM** | **0.9957** | **0.6893** | **0.8146** | **0.8877** |
 
-*Dynamic runtime metrics (sampled from loaded model at startup): F1=0.8125, Precision=0.9950, Recall=0.6866, AUC=0.8857*
+</div>
 
-### Improvement Over Baseline (Phase 3 → Phase 5)
+The One-Class SVM achieved the highest F1 Score while maintaining an exceptionally low false positive rate, making it the selected inference model for AutoShield Edge.
 
-| Metric | Phase 3 (per-message IF) | Phase 5 (behavioral OC-SVM) | Improvement |
-|---|---|---|---|
+---
+
+# Why One-Class Learning?
+
+Collecting labelled automotive attack datasets covering every possible cyber threat is impractical.
+
+Instead of relying on attack examples, AutoShield Edge learns only healthy vehicle behaviour.
+
+This enables:
+
+- Zero-day attack detection
+- Detection of previously unseen attacks
+- Better adaptability
+- Behaviour-based security
+- Lower dependency on continuously updated signatures
+
+This learning paradigm is particularly suitable for connected vehicles where new attack vectors emerge frequently.
+
+---
+
+# Backend Architecture
+
+The backend of AutoShield Edge is implemented using **FastAPI** and serves as the intelligence layer of the entire system.
+
+Unlike a traditional REST backend that only stores or retrieves data, the FastAPI backend performs the complete cybersecurity inference pipeline. It accepts vehicle behavioral data, processes it through the Behavioral Cyber Twin, executes anomaly detection, computes the Cyber Health Score, generates explainable threat narratives, determines defensive actions, and returns structured responses to the frontend.
+
+Every stage of the pipeline is modular, allowing each component to operate independently while contributing to the complete cybersecurity workflow.
+
+---
+
+# Backend Modules
+
+<div align="center">
+
+| Module | Responsibility |
+|:------:|:--------------|
+| API Layer | REST endpoints and request handling |
+| Preprocessing | Data normalization and behavioral window preparation |
+| Behavioral Detection Engine | One-Class anomaly detection |
+| Cyber Health Engine | Vehicle cybersecurity scoring |
+| Threat Story Engine | Explainable AI reasoning |
+| Self-Healing Response Agent | Automated defense decisions |
+| Dashboard API | Frontend communication |
+
+</div>
+
+---
+
+# Backend Processing Flow
+
+```text
+Frontend Request
+        │
+        ▼
+FastAPI Endpoint
+        │
+        ▼
+Behavioral Cyber Twin
+        │
+        ▼
+Behavioral Feature Extraction
+        │
+        ▼
+One-Class SVM Inference
+        │
+        ▼
+Cyber Health Engine
+        │
+        ▼
+Threat Story Engine
+        │
+        ▼
+Self-Healing Response Agent
+        │
+        ▼
+JSON Response
+```
+
+---
+
+# API Overview
+
+The backend exposes REST APIs that allow the frontend to visualize every stage of the cybersecurity pipeline.
+
+<div align="center">
+
+| Endpoint | Description |
+|:---------:|:-----------|
+| `/api/pipeline/run` | Executes the complete behavioral cybersecurity pipeline |
+| `/api/health` | Backend health status |
+| `/api/stats` | System performance statistics |
+| `/api/demo/attack-data` | Demonstration attack scenarios |
+| `/api/cyber-health` | Cyber Health Score |
+| `/api/threat-story` | Explainable threat narrative |
+| `/api/defense` | Self-healing response |
+| `/api/telemetry` | Vehicle telemetry |
+
+</div>
+
+---
+
+# Behavioral Threat Detection Engine
+
+The Behavioral Threat Detection Engine is the primary AI component responsible for detecting cyber attacks.
+
+Instead of evaluating individual CAN messages, it analyses behavioral windows containing multiple consecutive CAN frames.
+
+Each behavioral window is represented by thirteen engineered behavioral features.
+
+The trained One-Class Support Vector Machine learns only healthy vehicle behavior during training.
+
+During inference, every behavioral window receives:
+
+- Anomaly Score
+- Threat Confidence
+- Behavioral Classification
+
+Any significant deviation from the learned behavioral baseline is treated as a potential cyber attack.
+
+---
+
+# Threat Detection Workflow
+
+```text
+Behavioral Window
+        │
+        ▼
+Feature Scaling
+        │
+        ▼
+One-Class SVM
+        │
+        ▼
+Decision Function
+        │
+        ▼
+Anomaly Score
+        │
+        ▼
+Threat Classification
+```
+
+---
+
+# Vehicle Cyber Health Engine
+
+Raw anomaly scores are difficult for drivers and engineers to interpret.
+
+AutoShield Edge therefore converts behavioral anomalies into an intuitive cybersecurity health metric ranging from **0 to 100**.
+
+Higher scores represent healthier cybersecurity conditions.
+
+Lower scores indicate increasing behavioral deviation and cyber risk.
+
+The Cyber Health Score combines three independent behavioral dimensions.
+
+---
+
+## Cyber Health Components
+
+<div align="center">
+
+| Component | Weight | Purpose |
+|:---------:|:------:|:-------|
+| Threat Component | 40% | Severity of detected anomaly |
+| Behavioral Stability | 30% | Consistency of vehicle behavior |
+| Attack Pressure | 30% | Communication stress indicators |
+
+</div>
+
+---
+
+## Risk Categories
+
+<div align="center">
+
+| Score | Category |
+|:------:|:--------|
+| 80 – 100 | Secure |
+| 60 – 79 | Stable |
+| 40 – 59 | Warning |
+| 20 – 39 | High Risk |
+| 0 – 19 | Critical |
+
+</div>
+
+---
+
+## Cyber Health Formula
+
+```text
+Cyber Health Score
+
+= Threat Component
++ Stability Component
++ Attack Pressure Component
+
+Total Score = 100
+```
+
+Each component is derived from behavioral statistics and normalized using deviations from healthy vehicle behavior.
+
+This allows cybersecurity status to be monitored similarly to battery health or engine diagnostics.
+
+---
+
+# Explainable Threat Story Engine
+
+Detection alone is insufficient in automotive cybersecurity.
+
+Security engineers must understand why the AI model reached its conclusion.
+
+The Explainable Threat Story Engine transforms machine learning outputs into structured, human-readable explanations.
+
+Instead of displaying only anomaly scores, the engine generates explanations describing:
+
+- Current cybersecurity condition
+- Detected attack type
+- Root cause
+- Behavioral abnormalities
+- Primary contributing features
+- Expected consequences
+- Recommended actions
+
+This significantly improves trust and interpretability.
+
+---
+
+## Example Threat Story
+
+```text
+Cyber Health: 24
+
+Risk Level:
+High Risk
+
+Detected Threat:
+Denial of Service Attack
+
+Primary Cause:
+Abnormally high message transmission rate.
+
+Behavioral Changes:
+
+• Increased communication frequency
+• Reduced CAN diversity
+• Elevated attack pressure
+
+Recommended Action:
+
+Isolate affected ECU.
+Enable rate limiting.
+Continue monitoring.
+```
+
+---
+
+# Root Cause Attribution
+
+Every detected anomaly includes an explanation identifying the behavioral features that contributed most strongly to the AI decision.
+
+Typical explanations include:
+
+- High CAN ID entropy
+- Elevated message burst score
+- Payload instability
+- Communication frequency spikes
+- Timing irregularities
+
+These explanations allow cybersecurity engineers to investigate incidents more efficiently.
+
+---
+
+# Self-Healing Response Agent
+
+After identifying a cyber attack, AutoShield Edge automatically determines an appropriate defensive strategy.
+
+Instead of issuing generic alerts, the Response Agent selects actions according to:
+
+- Attack severity
+- Threat confidence
+- Cyber Health Score
+- Behavioral trend
+- Attack type
+
+This transforms intrusion detection into an active cyber defense mechanism.
+
+---
+
+# Response Levels
+
+<div align="center">
+
+| Level | Description |
+|:------:|:-----------|
+| 0 | Passive Monitoring |
+| 1 | Warning |
+| 2 | Containment |
+| 3 | Critical Protection |
+| 4 | Emergency Response |
+
+</div>
+
+---
+
+# Response Workflow
+
+```text
+Threat Detection
+        │
+        ▼
+Cyber Health Score
+        │
+        ▼
+Threat Story
+        │
+        ▼
+Response Decision
+        │
+        ▼
+Recommended Mitigation
+        │
+        ▼
+Recovery Monitoring
+```
+
+---
+
+# Frontend Demonstration
+
+The frontend is implemented using **Next.js**, **React**, and **Tailwind CSS**.
+
+Rather than acting as a conventional dashboard, it serves as an interactive demonstration platform that visualizes every stage of the Behavioral Cyber Twin.
+
+The interface communicates with the FastAPI backend and displays the progress of the complete cybersecurity pipeline.
+
+The demonstration is designed to help judges understand how behavioral information flows through the AI system.
+
+---
+
+# Demonstration Workflow
+
+```text
+Landing Page
+        │
+        ▼
+Attack Selection
+        │
+        ▼
+Run Live Demonstration
+        │
+        ▼
+Behavioral Pipeline Execution
+        │
+        ▼
+Threat Detection
+        │
+        ▼
+Cyber Health Visualization
+        │
+        ▼
+Threat Story
+        │
+        ▼
+Self-Healing Response
+        │
+        ▼
+Recovery Summary
+```
+
+---
+
+# Frontend Features
+
+- Interactive landing page
+- Attack scenario selection
+- Live pipeline execution
+- Stage-by-stage visualization
+- Cyber Health gauge
+- Behavioral metrics
+- Threat explanation
+- Self-healing response visualization
+- Recovery summary
+- Performance dashboard
+
+---
+
+# End-to-End AI Workflow
+
+The complete AutoShield Edge platform transforms raw CAN Bus communication into autonomous cybersecurity decisions.
+
+```text
+Vehicle
+   │
+CAN Bus
+   │
+Behavioral Window
+   │
+Feature Engineering
+   │
+One-Class SVM
+   │
+Cyber Health Score
+   │
+Threat Story
+   │
+Self-Healing Response
+   │
+Recovery
+```
+
+This modular architecture enables AutoShield Edge to detect, explain, and respond to cyber threats while maintaining transparency throughout the entire decision-making process.
+
+---
+
+# Experimental Results
+
+AutoShield Edge was evaluated using behavioral representations of CAN Bus communication generated from more than **17.5 million CAN messages**.
+
+The evaluation focuses on the ability of the Behavioral Cyber Twin to detect malicious behavioral deviations instead of classifying individual CAN messages.
+
+All experiments were performed using behavioral windows consisting of **50 consecutive CAN messages**, which provided the best balance between detection accuracy and computational efficiency.
+
+---
+
+# Model Evaluation
+
+Three anomaly detection algorithms were evaluated.
+
+<div align="center">
+
+| Model | Precision | Recall | F1 Score | AUC |
+|:------:|:---------:|:------:|:--------:|:---:|
+| Isolation Forest | 0.9936 | 0.4666 | 0.6350 | 0.8371 |
+| Local Outlier Factor | 0.9956 | 0.6810 | 0.8088 | 0.9055 |
+| **One-Class SVM** | **0.9957** | **0.6893** | **0.8146** | **0.8877** |
+
+</div>
+
+The One-Class Support Vector Machine achieved the highest overall F1 Score while maintaining an exceptionally low False Positive Rate, making it the selected inference model for AutoShield Edge.
+
+---
+
+# Performance Improvement
+
+The project originally used single-message anomaly detection.
+
+After introducing the Behavioral Cyber Twin architecture, performance improved significantly.
+
+<div align="center">
+
+| Metric | Phase 3 | Final System | Improvement |
+|:------:|:-------:|:------------:|:-----------:|
 | Precision | 0.4342 | 0.9957 | +129.3% |
 | Recall | 0.0643 | 0.6893 | +972.0% |
-| F1 | 0.1120 | 0.8146 | +627.3% |
+| F1 Score | 0.1120 | 0.8146 | +627.3% |
 | AUC | 0.5050 | 0.8877 | +75.8% |
 
-*Note: The `/api/stats` endpoint dynamically samples 50,000 windows (random seed 42) to compute live metrics. The runtime F1 may vary slightly from the full-evaluation values above (observed: 0.8125 vs 0.8146).*
+</div>
+
+The transition from message-level analysis to behavioral intelligence forms the primary innovation of the proposed system.
 
 ---
 
-## Achievements
+# Attack-wise Detection Performance
 
-- **17.5M CAN messages** processed across 5 attack scenarios
-- **350:1 data reduction** via behavioral windowing (W=50)
-- **F1 = 0.815** with One-Class SVM on behavioral features
-- **5 attack types** detected with zero-shot generalization
-- **9-stage inference pipeline** with SSE streaming
-- **5-level autonomous defense** agent with targeted playbooks
-- **Explainable AI** with per-feature attribution per window
-- **Inference-only backend** — no runtime training
+<div align="center">
 
----
+| Attack Type | Detection Rate |
+|:-----------:|:--------------:|
+| DoS | 64.00% |
+| Fuzzy | 59.63% |
+| Gear Spoofing | 74.96% |
+| RPM Spoofing | 74.75% |
 
-## Limitations
+</div>
 
-- **Static model**: OC-SVM is trained offline and does not adapt to evolving vehicle behavior post-deployment
-- **No real-time data capture**: Pipeline uses pre-recorded datasets; real OBD-II/CAN interface not integrated
-- **Rule-based explanations**: Threat stories and feature attribution are computed via z-score heuristics, not SHAP values
-- **No persistence**: Pipeline results are streamed but not stored; no audit trail across restarts
-- **Single-vehicle focus**: Digital twin parameters are dataset-specific and not generalized across vehicle models
-- **No authentication**: API endpoints are public; suitable only for demo/development environments
+The Behavioral Cyber Twin successfully identifies behavioral deviations even when individual CAN messages appear legitimate.
 
 ---
 
-## Future Improvements
+# Vehicle Cyber Health Results
 
-- **Online learning**: Incremental model updates as new normal data arrives
-- **Real CAN interface**: Live OBD-II/CAN bus capture via python-can or SocketCAN
-- **SHAP integration**: Compute real Shapley values for mathematically rigorous explanations
-- **Database persistence**: Store pipeline results in SQLite/PostgreSQL for audit and analysis
-- **Multi-vehicle support**: Fleet-level monitoring with vehicle-specific twin profiles
-- **Authentication & rate limiting**: API security for production deployment
-- **Mobile-responsive dashboard**: Enhanced mobile layout for the CyberHealthGauge
-- **SSE reconnection**: Graceful recovery from dropped streaming connections
+The Cyber Health Engine converts anomaly detection outputs into an interpretable cybersecurity score.
 
----
+<div align="center">
 
-## Contributing
+| Attack | Average Cyber Health |
+|:------:|:--------------------:|
+| Normal | 80.5 |
+| DoS | 49.9 |
+| Fuzzy | 48.8 |
+| Gear | 48.0 |
+| RPM | 47.2 |
 
-This project is developed and maintained internally. For questions, suggestions, or security disclosures, please open an issue on the repository or contact the maintainers directly.
+</div>
 
----
-
-## License
-
-Proprietary. All rights reserved.
+Cyber Health allows security engineers to monitor the cybersecurity condition of the vehicle in real time without analysing raw anomaly scores.
 
 ---
 
-## Acknowledgements
+# Risk Distribution
 
-- **CAN bus intrusion datasets** from the automotive security research community
-- **scikit-learn** for One-Class SVM and evaluation metrics
-- **FastAPI** for the asynchronous API framework
-- **Next.js** and **Vercel** for the React-based frontend framework
-- **Tailwind CSS** for utility-first styling
-- **Framer Motion** for declarative animations
+<div align="center">
+
+| Category | Percentage |
+|:---------:|:----------:|
+| Secure | 17.6% |
+| Stable | 16.1% |
+| Warning | 24.3% |
+| High Risk | 32.8% |
+| Critical | 9.3% |
+
+</div>
 
 ---
 
-## Contact
+# Behavioral Intelligence Benefits
 
-**Project**: AutoShield Edge  
-**Organization**: DeepMind Advanced Agentic Development  
-**Repository**: [github.com/asc006-git/AutoShield-Edge](https://github.com/asc006-git/AutoShield-Edge)
+Compared to conventional automotive intrusion detection systems, AutoShield Edge provides several advantages.
+
+<div align="center">
+
+| Traditional IDS | AutoShield Edge |
+|:---------------:|:---------------:|
+| Signature Based | Behavioral Learning |
+| Detects Known Attacks | Detects Known and Unknown Attacks |
+| Message-Level Analysis | Behavioral Window Analysis |
+| Limited Explainability | Explainable AI |
+| Static Rules | Adaptive Behavioral Intelligence |
+| Manual Investigation | Automated Threat Story |
+| Alert Generation | Self-Healing Response |
+
+</div>
+
+---
+
+# Generated Outputs
+
+The platform automatically produces:
+
+- Behavioral feature datasets
+- Model evaluation reports
+- ROC Curves
+- Confusion Matrices
+- Cyber Health Timeline
+- Risk Distribution Charts
+- Threat Stories
+- Response Decisions
+- Recovery Summaries
+- Interactive Dashboard
+
+---
+
+# Demonstration Screens
+
+The following screenshots should be included after completing the implementation.
+
+## Landing Page
+
+```
+docs/screenshots/landing-page.png
+```
+
+Shows the AutoShield Edge homepage and project introduction.
+
+---
+
+## Attack Selection
+
+```
+docs/screenshots/attack-selection.png
+```
+
+Displays available attack scenarios before starting the demonstration.
+
+---
+
+## Live Pipeline Execution
+
+```
+docs/screenshots/pipeline-execution.png
+```
+
+Shows all nine stages executing sequentially.
+
+---
+
+## Behavioral Threat Detection
+
+```
+docs/screenshots/threat-detection.png
+```
+
+Displays anomaly score, confidence, and detected attack.
+
+---
+
+## Cyber Health Dashboard
+
+```
+docs/screenshots/cyber-health.png
+```
+
+Illustrates Cyber Health Score together with component breakdown.
+
+---
+
+## Threat Story
+
+```
+docs/screenshots/threat-story.png
+```
+
+Shows Explainable AI output and generated threat narrative.
+
+---
+
+## Self-Healing Response
+
+```
+docs/screenshots/self-healing.png
+```
+
+Displays recommended defensive actions.
+
+---
+
+## Recovery Summary
+
+```
+docs/screenshots/recovery-summary.png
+```
+
+Shows mitigation outcome and restored cybersecurity condition.
+
+---
+
+# Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/asc006-git/AutoShield-Edge.git
+cd AutoShield-Edge
+```
+
+---
+
+## Backend Setup
+
+Install the required Python packages.
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the FastAPI server.
+
+```bash
+cd src/api
+python main.py
+```
+
+The backend starts at
+
+```
+http://localhost:8000
+```
+
+---
+
+## Frontend Setup
+
+Navigate to the dashboard directory.
+
+```bash
+cd dashboard
+```
+
+Install dependencies.
+
+```bash
+npm install
+```
+
+Run the development server.
+
+```bash
+npm run dev
+```
+
+The frontend becomes available at
+
+```
+http://localhost:3000
+```
+
+---
+
+# Running the Demonstration
+
+Start the backend server.
+
+Start the frontend application.
+
+Open
+
+```
+http://localhost:3000
+```
+
+Select one of the available attack scenarios.
+
+Click **Run Live Demonstration**.
+
+Observe the following sequence:
+
+1. Behavioral Window Generation
+2. Feature Extraction
+3. Behavioral Threat Detection
+4. Cyber Health Calculation
+5. Threat Story Generation
+6. Self-Healing Response
+7. Recovery Monitoring
+
+The frontend visualizes each stage while displaying outputs received from the FastAPI backend.
+
+---
+
+# System Requirements
+
+<div align="center">
+
+| Component | Requirement |
+|:---------:|:-----------:|
+| Operating System | Windows / Linux / macOS |
+| Python | 3.11 or later |
+| Node.js | 20+ |
+| RAM | Minimum 4 GB |
+| Recommended RAM | 8 GB or more |
+| Storage | Approximately 3 GB |
+
+</div>
+
+---
+
+# Current Limitations
+
+Although AutoShield Edge demonstrates strong behavioral threat detection capabilities, several enhancements remain possible.
+
+- Evaluated using offline CAN datasets.
+- Limited to four attack categories.
+- Single-vehicle behavioral baseline.
+- No direct integration with production vehicle ECUs.
+- Real-time CAN hardware integration is outside the current scope.
+
+These limitations provide opportunities for future research and deployment.
+
+---
