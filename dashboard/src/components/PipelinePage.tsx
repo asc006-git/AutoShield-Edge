@@ -1,15 +1,33 @@
 "use client";
 
-import React, { useEffect, useRef, useMemo } from "react";
+import React, { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePipeline, AttackType, LogEvent, StageData } from "@/context/PipelineContext";
+import { usePipeline, StageData } from "@/context/PipelineContext";
+import { ATTACKS } from "@/constants/attacks";
 import {
   Play, RotateCcw, ShieldCheck, Cpu,
   Terminal, ShieldAlert, HeartPulse, LineChart, FileText,
-  Wrench, Activity, HelpCircle, CheckCircle2, ArrowRight, Zap
+  Wrench, Activity, HelpCircle, CheckCircle2, Zap
 } from "lucide-react";
 import GlassCard from "@/components/GlassCard";
 import CyberHealthGauge from "@/components/CyberHealthGauge";
+
+interface FeatureItem {
+  name: string;
+  value: number;
+  description?: string;
+  is_anomalous?: boolean;
+}
+
+interface ActionItem {
+  name?: string;
+  action?: string;
+  description?: string;
+  detail?: string;
+  id?: string;
+  target?: string;
+  automated?: boolean;
+}
 
 export default function PipelinePage() {
   const {
@@ -22,6 +40,7 @@ export default function PipelinePage() {
     allLogs,
     runSimulation,
     resetSimulation,
+    pipelineError,
   } = usePipeline();
 
   const consoleEndRef = useRef<HTMLDivElement>(null);
@@ -38,15 +57,10 @@ export default function PipelinePage() {
 
   const isRunning = pipelineStatus === "running";
   const isCompleted = pipelineStatus === "completed";
+  // activeStage = the LAST COMPLETED stage (to display its full data/reasoning in center panel)
   const activeStage = currentStageIndex > 0 && currentStageIndex <= stages.length ? stages[currentStageIndex - 1] : null;
-
-  const attacks: { id: AttackType; label: string; desc: string }[] = [
-    { id: "normal", label: "Normal", desc: "Baseline nominal traffic" },
-    { id: "dos", label: "DoS Flood", desc: "CAN gateway saturation" },
-    { id: "fuzzy", label: "Fuzzing", desc: "Payload byte injection" },
-    { id: "gear", label: "Gear Spoofing", desc: "TCU signal manipulation" },
-    { id: "rpm", label: "RPM Spoofing", desc: "ECU velocity override" },
-  ];
+  // processingStageNum = the NEXT stage being worked on by the backend (shown as "PROCESSING" in timeline)
+  const processingStageNum = isRunning && currentStageIndex < 9 ? currentStageIndex + 1 : 0;
 
   const getStageIcon = (stageName: string, active: boolean) => {
     const size = "h-4.5 w-4.5";
@@ -65,18 +79,31 @@ export default function PipelinePage() {
     }
   };
 
-  // All values originate from backend response
-  const ecuStatus = activeStage?.data?.ecu_status;
-  const healthScore = activeStage?.data?.health_score;
-  const threatComponent = activeStage?.data?.threat_component;
-  const stabilityComponent = activeStage?.data?.stability_component;
-  const pressureComponent = activeStage?.data?.pressure_component;
+  // All values originate from backend response — derived from completed stages
+  // so KPI values persist after a stage is passed, not just while it's active.
+  const completedStages = stages.filter(s => s.status === "complete");
+  const latestWithEcu = [...completedStages].reverse().find(s => s.data?.ecu_status != null);
+  const latestWithHealth = [...completedStages].reverse().find(s => s.data?.health_score != null);
+  const latestWithThreats = [...completedStages].reverse().find(s => s.data?.threat_count != null);
+  const ecuStatus = latestWithEcu?.data?.ecu_status;
+  const healthScore = latestWithHealth?.data?.health_score;
   const measuredMs = activeStage?.data?.duration_ms;
-  const activeThreatCount = activeStage?.data?.threat_count;
+  const activeThreatCount = latestWithThreats?.data?.threat_count;
   const hasActiveThreat = activeThreatCount != null ? activeThreatCount > 0 : false;
+  const estimatedRemaining = activeStage?.data?.estimated_remaining_seconds ?? null;
+
+  // Determine if specific backend stages have completed yet
+  const cyberHealthStageReached = currentStageIndex >= 5; // Stage 5 = cyber_health
+  const threatDetectionReached = currentStageIndex >= 4; // Stage 4 = threat_detection
 
   return (
     <div className="space-y-6">
+      {pipelineError && (
+        <div className="px-4 py-2 rounded border border-red-500/30 bg-red-500/5 flex items-center gap-2 text-[10px] font-mono text-red-400">
+          <span className="h-3 w-3 flex-shrink-0 inline-flex items-center justify-center rounded-full bg-red-500/20 text-red-400 text-[8px] font-bold">!</span>
+          Pipeline error: {pipelineError}
+        </div>
+      )}
       {/* Top Section: Attack Selection & Control */}
       <GlassCard className="flex flex-col gap-4 border border-white/10" hoverable={false}>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -109,7 +136,7 @@ export default function PipelinePage() {
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2 border-t border-white/5">
-          {attacks.map((atk) => {
+          {ATTACKS.map((atk) => {
             const isSelected = selectedAttack === atk.id;
             return (
               <button
@@ -131,14 +158,16 @@ export default function PipelinePage() {
         </div>
       </GlassCard>
 
-      {/* KPI Bar */}
+      {/* KPI Bar — shows neutral states until backend stage data is available */}
       {currentStageIndex > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <GlassCard className="flex items-center gap-3 py-2 px-4" hoverable={false}>
             <HeartPulse className="h-4 w-4 text-gray-400" />
             <div>
               <p className="text-[8px] font-mono text-gray-500 uppercase tracking-wider">Cyber Health</p>
-              <p className="text-sm font-orbitron font-bold text-white">{healthScore}%</p>
+              <p className="text-sm font-orbitron font-bold text-white">
+                {cyberHealthStageReached && healthScore != null ? `${healthScore}%` : "—"}
+              </p>
             </div>
           </GlassCard>
           <GlassCard className="flex items-center gap-3 py-2 px-4" hoverable={false}>
@@ -146,7 +175,7 @@ export default function PipelinePage() {
             <div>
               <p className="text-[8px] font-mono text-gray-500 uppercase tracking-wider">ECU Status</p>
               <p className={`text-sm font-orbitron font-bold ${ecuStatus === "compromised" ? "text-white" : ecuStatus === "warn" ? "text-gray-300" : "text-gray-500"}`}>
-                {ecuStatus.toUpperCase()}
+                {ecuStatus != null ? ecuStatus.toUpperCase() : "—"}
               </p>
             </div>
           </GlassCard>
@@ -154,7 +183,11 @@ export default function PipelinePage() {
             <ShieldAlert className="h-4 w-4 text-gray-400" />
             <div>
               <p className="text-[8px] font-mono text-gray-500 uppercase tracking-wider">Threats</p>
-              <p className="text-sm font-orbitron font-bold text-white">{hasActiveThreat ? `${activeThreatCount} ACTIVE` : "0"}</p>
+              <p className="text-sm font-orbitron font-bold text-white">
+                {threatDetectionReached
+                  ? (hasActiveThreat ? `${activeThreatCount} ACTIVE` : "0")
+                  : "—"}
+              </p>
             </div>
           </GlassCard>
           <GlassCard className="flex items-center gap-3 py-2 px-4" hoverable={false}>
@@ -163,6 +196,11 @@ export default function PipelinePage() {
               <p className="text-[8px] font-mono text-gray-500 uppercase tracking-wider">Stage</p>
               <p className="text-sm font-orbitron font-bold text-white">{currentStageIndex}/9</p>
             </div>
+            {estimatedRemaining != null && pipelineStatus === "running" && (
+              <span className="ml-auto text-[8px] font-mono text-gray-500">
+                ~{estimatedRemaining}s left
+              </span>
+            )}
           </GlassCard>
         </div>
       )}
@@ -177,38 +215,49 @@ export default function PipelinePage() {
             </h3>
             <div className="relative pl-8 space-y-4">
               <div className="absolute left-[13px] top-4 bottom-4 w-px bg-white/10" />
-              {isRunning && (
+              {(isRunning || isCompleted) && (
                 <motion.div
                   className="absolute left-[13px] top-4 w-px bg-white"
-                  animate={{ height: `${currentStageIndex > 0 ? ((currentStageIndex - 1) / 8) * 100 : 0}%` }}
-                  transition={{ duration: 0.5 }}
+                  animate={{ height: `${isCompleted ? 100 : (completedStages.length > 0 ? (completedStages.length / 9) * 100 : 0)}%` }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
                 />
               )}
               {stages.map((stage, idx) => {
                 const stageNum = idx + 1;
-                const isStageActive = currentStageIndex === stageNum;
-                const isStagePassed = currentStageIndex > stageNum;
+                const isComplete = stage.status === "complete";
+                const isProcessing = stageNum === processingStageNum;
+                const isPending = stage.status === "pending" && !isProcessing;
                 let nodeBorder = "border-white/10 bg-black";
                 let textColor = "text-gray-600";
-                if (isStageActive) {
+                if (isProcessing) {
                   nodeBorder = "border-white bg-white/[0.08] shadow-[0_0_15px_rgba(255,255,255,0.2)]";
                   textColor = "text-white font-bold";
-                } else if (isStagePassed) {
+                } else if (isComplete) {
                   nodeBorder = "border-white/40 bg-white/[0.02]";
                   textColor = "text-gray-400";
+                } else if (isPending) {
+                  nodeBorder = "border-white/10 bg-black";
+                  textColor = "text-gray-600";
                 }
                 return (
                   <div key={stage.stage} className="relative flex items-center gap-3">
                     <div className={`absolute left-[-27px] w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-500 z-10 ${nodeBorder}`}>
-                      {getStageIcon(stage.stage, isStageActive)}
+                      {isProcessing ? (
+                        <motion.div
+                          className="absolute inset-[-3px] rounded-full border border-white/40"
+                          animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0, 0.6] }}
+                          transition={{ duration: 1.5, repeat: Infinity }}
+                        />
+                      ) : null}
+                      {getStageIcon(stage.stage, isProcessing || isComplete)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-center">
                         <span className={`text-[10px] font-orbitron tracking-wider ${textColor}`}>
                           {stageNum}. {stage.label}
                         </span>
-                        {isStagePassed && <CheckCircle2 className="h-3.5 w-3.5 text-gray-500" />}
-                        {isStageActive && (
+                        {isComplete && <CheckCircle2 className="h-3.5 w-3.5 text-gray-500" />}
+                        {isProcessing && (
                           <motion.span
                             animate={{ opacity: [0.3, 1, 0.3] }}
                             transition={{ duration: 1.2, repeat: Infinity }}
@@ -216,6 +265,9 @@ export default function PipelinePage() {
                           >
                             PROCESSING
                           </motion.span>
+                        )}
+                        {isPending && (
+                          <span className="text-[8px] font-mono text-gray-700 tracking-widest">PENDING</span>
                         )}
                       </div>
                     </div>
@@ -249,7 +301,7 @@ export default function PipelinePage() {
                       </h3>
                     </div>
                     <span className={`px-2 py-0.5 text-[9px] font-mono border rounded ${ecuStatus === "compromised" ? "border-white/30 bg-white/10 text-white" : ecuStatus === "warn" ? "border-white/20 bg-white/5 text-gray-300" : "border-white/10 bg-white/[0.02] text-gray-400"}`}>
-                      ECU: {ecuStatus.toUpperCase()}
+                      ECU: {ecuStatus != null ? ecuStatus.toUpperCase() : "—"}
                     </span>
                   </div>
 
@@ -283,7 +335,7 @@ export default function PipelinePage() {
 
                   {/* Stage-Specific Data Display */}
                   <div className="space-y-2 flex-1">
-                    <StageDataRenderer stage={activeStage} stageIndex={currentStageIndex} healthScore={healthScore} />
+                    <StageDataRenderer stage={activeStage} healthScore={healthScore} />
                   </div>
 
                   {/* Timing footer */}
@@ -297,10 +349,12 @@ export default function PipelinePage() {
               <div className="min-h-[420px] flex flex-col items-center justify-center text-center p-6 border border-white/5 rounded-xl bg-black/40">
                 <ShieldCheck className="h-12 w-12 text-gray-800 mb-4" />
                 <h4 className="text-xs font-orbitron tracking-widest text-gray-400 uppercase">
-                  pipeline offline
+                  {pipelineStatus === "running" ? "Running Simulation..." : "Waiting for Simulation"}
                 </h4>
                 <p className="text-[10px] font-mono text-gray-600 max-w-xs mt-1.5 leading-relaxed">
-                  Select a simulation scenario from the top panel and run to trigger real-time AI pipeline inference.
+                  {pipelineStatus === "running"
+                    ? "Executing behavior twin inference pipeline. Waiting for backend response..."
+                    : <>Select a cyber attack scenario above and click <span className="text-gray-400 font-semibold">RUN SIMULATION</span> to trigger real-time AI pipeline inference.</>}
                 </p>
               </div>
             )}
@@ -318,7 +372,7 @@ export default function PipelinePage() {
             </div>
             <div className="flex-1 overflow-y-auto space-y-2 pr-1 font-mono text-[9px] text-gray-400 leading-snug">
               {allLogs.length > 0 ? (
-                allLogs.map((evt, idx) => (
+                allLogs.slice(-100).map((evt, idx) => (
                   <div key={idx} className="space-y-0.5">
                     <div className="flex justify-between text-gray-600">
                       <span>[{evt.timestamp}]</span>
@@ -392,11 +446,11 @@ export default function PipelinePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[10px] font-mono mb-4">
                 <div className="p-3 bg-white/[0.02] border border-white/5 rounded">
                   <span className="text-gray-500 block">Model Used</span>
-                  <span className="text-white font-bold text-xs mt-1 block tracking-wide">{summary.model_used || "OC-SVM"}</span>
+                  <span className="text-white font-bold text-xs mt-1 block tracking-wide">{summary.model_used || "—"}</span>
                 </div>
                 <div className="p-3 bg-white/[0.02] border border-white/5 rounded">
                   <span className="text-gray-500 block">Features Extracted</span>
-                  <span className="text-white font-bold text-xs mt-1 block tracking-wide">{summary.features_extracted_count ?? 13}</span>
+                  <span className="text-white font-bold text-xs mt-1 block tracking-wide">{summary.features_extracted_count ?? "—"}</span>
                 </div>
                 <div className="p-3 bg-white/[0.02] border border-white/5 rounded">
                   <span className="text-gray-500 block">Recovery Time</span>
@@ -431,7 +485,7 @@ export default function PipelinePage() {
   );
 }
 
-function StageDataRenderer({ stage, stageIndex, healthScore }: { stage: StageData; stageIndex: number; healthScore: number }) {
+function StageDataRenderer({ stage, healthScore }: { stage: StageData; healthScore: number | undefined }) {
   const d = stage.data;
 
   // Extract threat/stability/pressure components safely
@@ -491,7 +545,7 @@ function StageDataRenderer({ stage, stageIndex, healthScore }: { stage: StageDat
             Extracted Feature Values (Active Window)
           </p>
           <div className="max-h-56 overflow-y-auto pr-1 space-y-1 text-[10px] font-mono">
-            {d.features?.map((feat: any) => (
+            {d.features?.map((feat: FeatureItem) => (
               <div key={feat.name} className="flex justify-between py-1 px-1.5 bg-white/[0.01] border border-white/5 rounded">
                 <span className="text-gray-400">{feat.name}</span>
                 <span className="text-white font-semibold">{feat.value}</span>
@@ -533,7 +587,7 @@ function StageDataRenderer({ stage, stageIndex, healthScore }: { stage: StageDat
       return (
         <div className="space-y-3 flex flex-col items-center">
           <CyberHealthGauge
-            score={healthScore}
+            score={d.health_score ?? 0}
             size={150}
             showDetails={false}
             threatComponent={threatComp}
@@ -569,7 +623,7 @@ function StageDataRenderer({ stage, stageIndex, healthScore }: { stage: StageDat
           <p className="text-[9px] font-mono text-gray-500 uppercase tracking-widest">
             Feature Attribution Contributions
           </p>
-          {d.features?.map((feat: any, idx: number) => (
+          {d.features?.map((feat: FeatureItem, idx: number) => (
             <div key={idx} className="space-y-1">
               <div className="flex justify-between text-[10px] font-mono">
                 <span className="text-gray-400">{feat.name}</span>
@@ -627,7 +681,7 @@ function StageDataRenderer({ stage, stageIndex, healthScore }: { stage: StageDat
                 Mitigation Actions Executed
               </p>
               <div className="max-h-36 overflow-y-auto space-y-1 text-[10px] font-mono">
-                {d.actions.map((act: any, idx: number) => (
+                {d.actions.map((act: ActionItem, idx: number) => (
                   <div key={idx} className="p-2 bg-white/[0.01] border border-white/5 rounded">
                     <div className="flex justify-between">
                       <span className="text-white font-semibold">{act.name || act.action}</span>

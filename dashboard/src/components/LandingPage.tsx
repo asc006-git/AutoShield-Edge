@@ -1,10 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { usePipeline, AttackType } from "@/context/PipelineContext";
-import { ArrowRight, Cpu, ShieldCheck, Zap, Radio, HeartPulse, Terminal } from "lucide-react";
+import { usePipeline } from "@/context/PipelineContext";
+import { ATTACKS } from "@/constants/attacks";
+import { ArrowRight, Cpu, ShieldCheck, Zap, Radio, HeartPulse, Terminal, AlertTriangle } from "lucide-react";
 import GlassCard from "@/components/GlassCard";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 const systemPhases = [
   { id: 1, name: "Data Acquisition", sub: "Raw CAN messages capture" },
@@ -18,20 +21,53 @@ const systemPhases = [
   { id: 9, name: "Vehicle Recovery", sub: "Recalibration & Segment restore" },
 ];
 
-const ATTACK_OPTIONS: { id: AttackType; label: string; desc: string }[] = [
-  { id: "normal", label: "Normal Driving", desc: "No attack — baseline behavior" },
-  { id: "dos", label: "DoS Injection", desc: "CAN bus flooding attack" },
-  { id: "fuzzy", label: "Fuzzy Attack", desc: "Random malicious CAN IDs" },
-  { id: "gear", label: "Gear Spoof", desc: "Fabricated gear messages" },
-  { id: "rpm", label: "RPM Spoof", desc: "Fabricated RPM messages" },
-];
+
 
 export default function LandingPage() {
-  const { setCurrentPage, selectedAttack, setSelectedAttack, runSimulation } = usePipeline();
+  const { setCurrentPage, selectedAttack, setSelectedAttack, runSimulation, backendOnline, pipelineError } = usePipeline();
+  const [stats, setStats] = useState<{ f1: number; latency_ms: number; reduction: string; canRate: number } | null>(null);
+  const [statsError, setStatsError] = useState<string | null>(null);
 
-  const handleStartDemo = async () => {
-    await runSimulation(selectedAttack);
+  useEffect(() => {
+    let active = true;
+    let retries = 0;
+    const maxRetries = 3;
+    const fetchStats = () => {
+      fetch(`${API_URL}/api/stats`)
+        .then(r => {
+          if (!r.ok) throw new Error(`HTTP error ${r.status}`);
+          return r.json();
+        })
+        .then(d => {
+          if (active && d) {
+            setStats({
+              f1: d.ensemble_f1 ?? 0.815,
+              latency_ms: d.edge_latency_ms ?? 3.2,
+              reduction: d.data_reduction ?? "350:1",
+              canRate: d.can_rate ?? 1250,
+            });
+            setStatsError(null);
+          }
+        })
+        .catch(err => {
+          console.error("Error fetching stats:", err);
+          if (active) {
+            if (retries < maxRetries) {
+              retries++;
+              setTimeout(fetchStats, 2000);
+            } else {
+              setStatsError("Could not retrieve model stats from backend. Verify dataset and server state.");
+            }
+          }
+        });
+    };
+    fetchStats();
+    return () => { active = false; };
+  }, []);
+
+  const handleStartDemo = () => {
     setCurrentPage("pipeline");
+    runSimulation(selectedAttack);
   };
 
   return (
@@ -45,6 +81,28 @@ export default function LandingPage() {
       {/* Grid overlay */}
       <div className="absolute inset-0 monochrome-grid opacity-[0.05] pointer-events-none -z-10" />
       <div className="absolute inset-0 scanlines opacity-[0.02] pointer-events-none -z-10" />
+
+      {/* Connectivity warning */}
+      {!backendOnline && (
+        <div className="mb-4 px-4 py-2 rounded border border-yellow-500/30 bg-yellow-500/5 flex items-center gap-2 text-[10px] font-mono text-yellow-400">
+          <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+          Backend offline — start the server at {API_URL}
+        </div>
+      )}
+
+      {statsError && (
+        <div className="mb-4 px-4 py-2 rounded border border-yellow-500/30 bg-yellow-500/5 flex items-center gap-2 text-[10px] font-mono text-yellow-400">
+          <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+          {statsError}
+        </div>
+      )}
+
+      {pipelineError && (
+        <div className="mb-4 px-4 py-2 rounded border border-red-500/30 bg-red-500/5 flex items-center gap-2 text-[10px] font-mono text-red-400">
+          <AlertTriangle className="h-3 w-3 flex-shrink-0" />
+          Pipeline error: {pipelineError}
+        </div>
+      )}
 
       {/* Top Header bar */}
       <header className="flex justify-between items-center mb-12">
@@ -91,7 +149,7 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-sm text-gray-400 font-mono leading-relaxed max-w-lg"
           >
-            A Behavioral Cyber Twin platform for connected vehicles. Utilizing windowed One-Class SVM models and SHAP explainability on the edge, AutoShield provides zero-shot threat detection and autonomous self-healing recovery.
+            A Behavioral Cyber Twin platform for connected vehicles. Utilizing windowed One-Class SVM models and real-time feature attribution on the edge, AutoShield provides zero-shot threat detection and autonomous self-healing recovery.
           </motion.p>
 
           {/* Attack selector */}
@@ -101,7 +159,7 @@ export default function LandingPage() {
             transition={{ duration: 0.6, delay: 0.25 }}
             className="flex flex-wrap gap-2"
           >
-            {ATTACK_OPTIONS.map((atk) => {
+            {ATTACKS.map((atk) => {
               const isSelected = selectedAttack === atk.id;
               return (
                 <button
@@ -144,17 +202,29 @@ export default function LandingPage() {
           >
             <div className="space-y-1">
               <span className="text-[10px] font-mono text-gray-600 block">ENSEMBLE F1</span>
-              <span className="font-orbitron font-bold text-base text-gray-300">0.815</span>
+              <span className="font-orbitron font-bold text-base text-gray-300">
+                {stats ? stats.f1.toFixed(3) : (
+                  <div className="h-5 w-16 bg-white/10 rounded animate-pulse inline-block mt-1" />
+                )}
+              </span>
               <span className="text-[8px] font-mono text-gray-500 block">vs 0.112 Baseline</span>
             </div>
             <div className="space-y-1">
               <span className="text-[10px] font-mono text-gray-600 block">EDGE LATENCY</span>
-              <span className="font-orbitron font-bold text-base text-gray-300">&lt; 3.2ms</span>
+              <span className="font-orbitron font-bold text-base text-gray-300">
+                {stats ? `< ${stats.latency_ms.toFixed(1)}ms` : (
+                  <div className="h-5 w-16 bg-white/10 rounded animate-pulse inline-block mt-1" />
+                )}
+              </span>
               <span className="text-[8px] font-mono text-gray-500 block">Real-time inference</span>
             </div>
             <div className="space-y-1">
               <span className="text-[10px] font-mono text-gray-600 block">REDUCTION</span>
-              <span className="font-orbitron font-bold text-base text-gray-300">350:1</span>
+              <span className="font-orbitron font-bold text-base text-gray-300">
+                {stats ? stats.reduction : (
+                  <div className="h-5 w-16 bg-white/10 rounded animate-pulse inline-block mt-1" />
+                )}
+              </span>
               <span className="text-[8px] font-mono text-gray-500 block">Windowed pooling</span>
             </div>
           </motion.div>
@@ -187,7 +257,7 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-[9px] font-mono text-gray-500">
-              <span className="flex items-center gap-1"><Radio className="h-2.5 w-2.5 text-gray-400" /> CAN Ingress: 1250 pkt/s</span>
+              <span className="flex items-center gap-1"><Radio className="h-2.5 w-2.5 text-gray-400" /> CAN Ingress: {stats ? `${stats.canRate} pkt/s` : "1250 pkt/s"}</span>
               <span className="flex items-center gap-1"><Zap className="h-2.5 w-2.5 text-gray-400" /> Autonomous Countermeasures</span>
               <span className="flex items-center gap-1"><HeartPulse className="h-2.5 w-2.5 text-gray-400" /> Safe Recovery</span>
             </div>

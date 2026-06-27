@@ -1,6 +1,6 @@
 [
   {
-    "timestamp": "2026-06-23T13:06:21.152330",
+    "timestamp": "2026-06-27T14:11:09.641405",
     "window_index": 5236,
     "risk_category": "Secure",
     "health_score": 80.61,
@@ -24,7 +24,7 @@
     "safety_notes": "No safety impact"
   },
   {
-    "timestamp": "2026-06-23T13:06:21.153565",
+    "timestamp": "2026-06-27T14:11:09.641405",
     "window_index": 22191,
     "risk_category": "High Risk",
     "health_score": 22.28,
@@ -80,7 +80,7 @@
     "safety_notes": "Minimal \u2014 actions are reversible"
   },
   {
-    "timestamp": "2026-06-23T13:06:21.153565",
+    "timestamp": "2026-06-27T14:11:09.642488",
     "window_index": 107872,
     "risk_category": "Critical",
     "health_score": 13.45,
@@ -186,7 +186,7 @@
     "safety_notes": "HIGH \u2014 vehicle may enter limp-home mode"
   },
   {
-    "timestamp": "2026-06-23T13:06:21.153565",
+    "timestamp": "2026-06-27T14:11:09.642488",
     "window_index": 191782,
     "risk_category": "High Risk",
     "health_score": 33.29,
@@ -242,7 +242,7 @@
     "safety_notes": "Minimal \u2014 actions are reversible"
   },
   {
-    "timestamp": "2026-06-23T13:06:21.153565",
+    "timestamp": "2026-06-27T14:11:09.642488",
     "window_index": 308662,
     "risk_category": "High Risk",
     "health_score": 32.46,

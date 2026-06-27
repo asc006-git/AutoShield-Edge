@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const DemonstrationApp = dynamic(() => import("@/components/DemonstrationApp"), {
   ssr: false,
@@ -14,5 +15,9 @@ const DemonstrationApp = dynamic(() => import("@/components/DemonstrationApp"), 
 });
 
 export default function Home() {
-  return <DemonstrationApp />;
+  return (
+    <ErrorBoundary>
+      <DemonstrationApp />
+    </ErrorBoundary>
+  );
 }

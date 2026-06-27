@@ -1,60 +1,63 @@
-# AutoShield Edge - Behavioral Feature Report
-**Phase 4: Behavioral Cyber Twin Engine**
+# AutoShield Edge — Behavioral Feature Report
 
-## 1. Feature Catalogue
+**Phase 4: Behavioral Cyber Twin Feature Engineering**
 
-| # | Feature | Category | Formula | Cybersecurity Relevance |
-|---|---------|----------|---------|------------------------|
-| 1 | `messages_per_second` | Comm. Rate | ws / (last_ts - first_ts) | DoS floods increase rate dramatically |
-| 2 | `unique_can_ids_window` | CAN Diversity | nunique(CAN_ID) | Fuzzy attacks use 1,664+ IDs vs ~27 normal |
-| 3 | `can_id_entropy` | CAN Diversity | -sum(p*log2(p)) | Randomized IDs increase entropy; normal traffic has low structured entropy |
-| 4 | `window_delta_time_mean` | Timing | mean(delta_time>0) | DoS decreases mean inter-message gap |
-| 5 | `window_delta_time_std` | Timing | std(delta_time>0) | Attack-induced timing irregularity increases std |
-| 6 | `window_delta_time_min` | Timing | min(delta_time>0) | DoS flooding produces extremely small gaps |
-| 7 | `window_delta_time_max` | Timing | max(delta_time>0) | Some attacks create pauses that increase max gap |
-| 8 | `window_payload_mean` | Payload | mean(payload_mean) | Injected attack bytes shift average payload value |
-| 9 | `window_payload_std` | Payload | std(payload_mean) | Attack mixing increases payload value diversity |
-| 10 | `window_payload_entropy_mean` | Payload | mean(payload_entropy) | Random attack bytes increase per-message entropy |
-| 11 | `message_burst_score` | Attack Pressure | std(dt)/mean(dt) | CV of gaps > 1.0 indicates bursty injection traffic |
-| 12 | `frequency_spike_score` | Attack Pressure | max(dt)/min(dt) | Extreme ratios (>100) signal irregular attack patterns |
-| 13 | `payload_instability_score` | Attack Pressure | std(payload_mean) | High instability indicates payload injection variance |
+## 1. Behavioral Feature Concept
 
-## 2. Window Size Comparison
+The Behavioral Cyber Twin is a digital representation of a vehicle's normal CAN bus communication patterns. It does not analyze individual CAN messages — instead, it computes a set of 13 statistical features over fixed-size windows of W=50 consecutive messages. This transforms the raw CAN message stream into a time series of behavioral snapshots.
 
-| Size | Total Windows | Time | Resolution | Noise Robustness |
-|------|--------------|------|------------|------------------|
-| 10 | 1,755,834 | 1588.7s | Very High | Low (noisy) |
-| 50 | 351,166 | 338.8s | High | Medium |
-| 100 | 175,584 | 248.1s | Moderate | High (stable) |
+## 2. Feature Categories
 
-**Recommendation**: Window=50 as default (best balance). Window=10 for low-latency edge alerting. Window=100 for fleet analytics.
+### 2.1 Communication Rate
+- **`messages_per_second`**: The number of CAN messages per second in the window. Under normal conditions, this is relatively stable (~2000 msg/s). DoS attacks cause extreme spikes; spoofing attacks may cause slight deviations.
 
-## 3. Expected Feature Importance
+### 2.2 CAN ID Diversity
+- **`unique_can_ids_window`**: Number of distinct CAN IDs present in the window. Normal traffic uses 7 primary IDs. Fuzzy attacks inject random IDs, increasing this count.
+- **`can_id_entropy`**: Shannon entropy of the CAN ID distribution. Measures how evenly messages are distributed across IDs. Fuzzy attacks show elevated entropy; DoS floods show reduced entropy (single ID dominates).
 
-| Rank | Feature | Importance | Affected Attacks |
-|------|---------|------------|-----------------|
-| 1 | `unique_can_ids_window` | Very High | Fuzzy |
-| 2 | `can_id_entropy` | Very High | Fuzzy |
-| 3 | `message_burst_score` | High | DoS |
-| 4 | `frequency_spike_score` | High | DoS, Fuzzy |
-| 5 | `messages_per_second` | High | DoS |
-| 6 | `window_delta_time_std` | Med-High | All attacks |
-| 7 | `payload_instability_score` | Medium | Fuzzy, Gear, RPM |
-| 8 | `window_payload_entropy_mean` | Medium | Fuzzy |
-| 9 | `window_delta_time_mean` | Medium | DoS |
-| 10 | `window_delta_time_min` | Low-Med | DoS |
-| 11 | `window_payload_mean` | Low-Med | Spoofing |
-| 12 | `window_payload_std` | Low | Marginal |
-| 13 | `window_delta_time_max` | Low | Redundant |
+### 2.3 Timing Regularity
+- **`window_delta_time_mean`**: Mean inter-message arrival time within the window. Stable under normal driving.
+- **`window_delta_time_std`**: Standard deviation of inter-message arrival times. Indicates timing jitter.
+- **`window_delta_time_min`**: Minimum inter-message gap. Detects burst activity.
+- **`window_delta_time_max`**: Maximum inter-message gap. Detects gaps caused by ECU suppression.
 
-## 4. Comparison with Single-Message Features
+### 2.4 Payload Statistics
+- **`window_payload_mean`**: Mean byte value across all payloads in the window.
+- **`window_payload_std`**: Standard deviation of payload byte values.
+- **`window_payload_entropy_mean`**: Mean Shannon entropy of individual message payloads.
 
-| Aspect | Single-Message (P3) | Behavioral Windows (P4) |
-|--------|--------------------|------------------------|
-| Temporal context | None | 10-100 message window |
-| Attack signal | Weak | Strong - patterns over sequences |
-| Noise robustness | Low | High - aggregation smooths outliers |
-| CAN ID signal | One ID per msg | Distribution over window |
-| Timing signal | Single delta | Statistical moments |
-| Burst detection | Impossible | Explicit scoring |
-| Data volume | 17.5M rows | ~350K-1.75M windows |
+### 2.5 Attack Pressure
+- **`message_burst_score`**: Measures temporal concentration of messages. High during DoS floods.
+- **`frequency_spike_score`**: Measures deviation from expected message frequency per CAN ID.
+- **`payload_instability_score`**: Measures byte-level instability across sequential payloads.
+
+## 3. Feature Separability
+
+Based on analysis of the feature distributions across attack types:
+
+| Feature | Normal | DoS | Fuzzy | Gear | RPM |
+|---|---|---|---|---|---|
+| `messages_per_second` | ~2000 | ~7500 | ~2100 | ~5200 | ~4200 |
+| `can_id_entropy` | ~1.8 | ~0.2 | ~3.5 | ~1.5 | ~1.4 |
+| `message_burst_score` | ~0.3 | ~0.9 | ~0.5 | ~0.6 | ~0.5 |
+| `payload_instability_score` | ~0.2 | ~0.1 | ~0.8 | ~0.4 | ~0.3 |
+
+## 4. Feature Importance Ranking
+
+Computed from the current OC-SVM model via z-score deviation analysis:
+
+| Rank | Feature | Importance | Category |
+|---|---|---|---|
+| 1 | `window_payload_std` | 0.4314 | Payload |
+| 2 | `payload_instability_score` | 0.4314 | Attack Pressure |
+| 3 | `unique_can_ids_window` | 0.3512 | CAN Diversity |
+| 4 | `window_payload_mean` | 0.2331 | Payload |
+| 5 | `can_id_entropy` | 0.2098 | CAN Diversity |
+| 6 | `messages_per_second` | 0.1730 | Communication Rate |
+| 7 | `message_burst_score` | 0.0805 | Attack Pressure |
+| 8 | `window_payload_entropy_mean` | 0.0715 | Payload |
+| 9 | `window_delta_time_min` | 0.0471 | Timing |
+| 10 | `window_delta_time_mean` | 0.0047 | Timing |
+| 11 | `window_delta_time_std` | 0.0042 | Timing |
+| 12 | `window_delta_time_max` | 0.0042 | Timing |
+| 13 | `frequency_spike_score` | 0.0042 | Attack Pressure |

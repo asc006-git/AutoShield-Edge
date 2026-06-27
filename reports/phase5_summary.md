@@ -1,83 +1,31 @@
 # AutoShield Edge — Phase 5 Summary
 
-**Behavioral Threat Detection Engine V2**
+**Behavioral Threat Detection — One-Class SVM Ensemble**
 
 ## Overview
-
-Trained and evaluated 3 one-class anomaly detectors (Isolation Forest, LOF, One-Class SVM) on 13 behavioral window features (W=50). All models trained exclusively on normal vehicle behavior and tested against 4 attack types.
+Trained and evaluated three one-class anomaly detectors on behavioral windows. Selected One-Class SVM (nu=0.01, RBF kernel) as the production model with F1=0.815 — a 627% improvement over Phase 3 baseline.
 
 ## Key Results
+| Metric | IF | LOF | OC-SVM |
+|---|---|---|---|
+| F1 | 0.6350 | 0.8088 | **0.8146** |
+| Recall | 0.4666 | 0.6810 | **0.6893** |
+| Precision | 0.9936 | 0.9956 | **0.9957** |
+| AUC | 0.8371 | **0.9055** | 0.8877 |
+| Train Time | 4.4s | 36.1s | **4.1s** |
 
-| Metric | One-Class SVM |
+## Selected Model: One-Class SVM
+- **nu**: 0.01 (expected ~1% outliers)
+- **kernel**: RBF (gamma='scale')
+- **Training data**: 19,777 normal windows
+- **Threshold**: 5th percentile of training scores
 
-|--------|------|
+## Improvement Trajectory
+| Phase | Model | F1 | Improvement |
+|---|---|---|---|
+| Phase 3 | Per-message IF | 0.112 | — |
+| Phase 5 | Behavioral OC-SVM | 0.815 | +627% |
 
-| Precision | 0.9957 |
-
-| Recall | 0.6893 |
-
-| F1 | 0.8146 |
-
-| AUC | 0.8877 |
-
-| FPR | 0.0500 |
-
-| Detection_Rate | 0.6893 |
-
-
-## Per-Attack Detection
-
-| Attack | One-Class SVM |
-
-|--------|------|
-
-| Normal | 0.0000 |
-
-| DoS | 0.6400 |
-
-| Fuzzy | 0.5963 |
-
-| Gear | 0.7496 |
-
-| RPM | 0.7475 |
-
-
-## Comparison vs Phase 3 (Single-Message IF)
-
-| Metric | Phase 3 | Phase 5 (One-Class SVM) | Improvement |
-
-|--------|---------|-------------------------|-------------|
-
-| Precision | 0.4342 | 0.9957 | +129.3% |
-
-| Recall | 0.0643 | 0.6893 | +972.0% |
-
-| F1 | 0.1120 | 0.8146 | +627.3% |
-
-| AUC | 0.5050 | 0.8877 | +75.8% |
-
-
-## Key Findings
-
-1. **Behavioral features dramatically improve detection** — All 3 models significantly outperform Phase 3's single-message IF.
-
-2. **CAN diversity features are strongest** — `unique_can_ids_window` and `can_id_entropy` dominate feature importance.
-
-3. **Fuzzy attacks are most detectable** — ID randomization produces extreme CAN diversity values.
-
-4. **Stealth attacks (Gear, RPM) improve** — Timing and payload instability features capture subtle spoofing patterns.
-
-5. **LOF excels at local density detection** — Best for capturing timing irregularities.
-
-
-## Deployment Recommendation
-
-- **Primary detector**: Isolation Forest (fast, interpretable, strong feature importance)
-
-- **Secondary sensor**: LOF (complementary local density detection)
-
-- **Ensemble fusion**: Weighted voting of IF + LOF for robust detection
-
-- **Threshold**: Adaptive calibration using normal-traffic percentiles
-
-- **Edge deployment**: ONNX conversion for real-time inference
+## Serialized Outputs
+- `data/models/ocsvm_model.joblib` — trained OC-SVM
+- `data/models/scaler.joblib` — fitted StandardScaler

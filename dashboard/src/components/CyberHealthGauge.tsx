@@ -66,17 +66,6 @@ export default function CyberHealthGauge({
         animate: { pathLength: clampedScore / 100 },
       }
 
-  const barAnim = animated
-    ? {
-        initial: { width: 0 },
-        animate: { width: '100%' as const },
-        transition: { duration: 1.2, ease: [0.25, 0.1, 0.25, 1] as const },
-      }
-    : {
-        initial: { width: '100%' as const },
-        animate: { width: '100%' as const },
-      }
-
   const glowPath = describeArc(cx, cy, radius + 6, startAngle, endAngle)
 
   const tickMarks = [0, 25, 50, 75, 100].map((tick) => {
@@ -95,29 +84,30 @@ export default function CyberHealthGauge({
   const breakdownItems = [
     {
       label: 'Threat',
-      value: threatComponent ?? Math.round(Math.max(0, Math.min(100, 100 - clampedScore * 0.85 + 5))),
+      value: threatComponent ?? 0,
     },
     {
       label: 'Stability',
-      value: stabilityComponent ?? Math.round(Math.max(0, Math.min(100, clampedScore * 0.9 + 5))),
+      value: stabilityComponent ?? 0,
     },
     {
       label: 'Pressure',
-      value: pressureComponent ?? Math.round(Math.max(0, Math.min(100, 100 - clampedScore * 0.75))),
+      value: pressureComponent ?? 0,
     },
   ]
 
   return (
     <div
       style={{
-        width: size,
+        width: '100%',
+        maxWidth: size,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         userSelect: 'none',
       }}
     >
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <svg width="100%" height={size} viewBox={`0 0 ${size} ${size}`} style={{ maxWidth: size }}>
         <defs>
           <filter id="gauge-glow" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur stdDeviation="4" result="blur" />

@@ -1,34 +1,26 @@
-# AutoShield Edge - Phase 4 Summary
-**Behavioral Cyber Twin Engine**
+# AutoShield Edge — Phase 4 Summary
+
+**Behavioral Cyber Twin — Sliding-Window Feature Engineering**
 
 ## Overview
-Generated rolling-window behavioral features addressing Phase 3's key limitation: single-message features lack temporal context for attack pattern detection.
+Designed and validated the Behavioral Cyber Twin concept: a digital representation of CAN bus behavior that transforms raw message streams into fixed-size behavioral windows with 13 statistical features.
 
-## Final Behavioral Feature List (13 + 2 labels)
+## Key Results
+- **3 window sizes evaluated**: W=10, 50, 100
+- **W=50 selected** as optimal balance of sensitivity vs latency
+- **13 features** across 5 behavioral categories
+- **351,166 windows** generated from 17.5M CAN messages
+- **Data reduction**: 50:1 (messages → windows)
 
-| Category | Features | Count |
-|----------|----------|-------|
-| Communication Rate | `messages_per_second` | 1 |
-| CAN Diversity | `unique_can_ids_window`, `can_id_entropy` | 2 |
-| Timing Behavior | `window_delta_time_mean`, `_std`, `_min`, `_max` | 4 |
-| Payload Behavior | `window_payload_mean`, `_std`, `_entropy_mean` | 3 |
-| Attack Pressure | `message_burst_score`, `frequency_spike_score`, `payload_instability_score` | 3 |
-| Labels | `Attack_Label`, `Attack_Type` | 2 |
-| **Total** | | **15** |
+## Feature Categories
+| Category | Features | Behavioral Signal |
+|---|---|---|
+| Communication Rate | messages_per_second | Flooding detection |
+| CAN Diversity | unique_can_ids, entropy | ID spoofing detection |
+| Timing | delta_time mean/std/min/max | Timing irregularity |
+| Payload | payload mean/std/entropy | Payload manipulation |
+| Attack Pressure | burst, spike, instability | Coordinated attack detection |
 
-## Window Size Recommendation
-
-| Size | Windows Generated | Best For |
-|------|-----------------|----------|
-| **10** | 1,755,834 | Low-latency edge alerting |
-| **50** | 351,166 | General detection (default) |
-| **100** | 175,584 | Fleet analytics / baselines |
-
-## Readiness for Next-Generation Anomaly Detection
-
-1. **Expected baseline improvement**: Precision >0.80, Recall >0.75 (vs P3: F1=0.112)
-2. **Window=50** recommended as primary input for Phase 5 model training
-3. **Top expected features**: `unique_can_ids_window`, `can_id_entropy`, `message_burst_score`
-4. **Data reduction**: ~350:1 compression (17.5M msgs -> ~350K windows at W=50)
-5. **Recommended algorithms**: Isolation Forest, Autoencoder, XGBoost on window features
-6. **Path to production**: Windowed features enable sub-100ms edge inference latency
+## Output
+- 5 parquet files in `data/behavioral/`
+- Ready for Phase 5 model training

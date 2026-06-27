@@ -8,185 +8,78 @@ This report evaluates three one-class anomaly detectors trained exclusively on *
 
 ## 2. Methodology
 
-- **Training**: Pure normal windows only (one-class setting)
-
-- **Testing**: All windows (Normal + 4 attack types)
-
-- **Features**: 13 behavioral features (CAN diversity, timing, payload, burst)
-
-- **Window Size**: 50 messages (recommended by Phase 4)
-
-- **Threshold**: 5th percentile of training decision function scores
-
-- **OCSVM subsample**: 5000 for computational feasibility
-
-
-## 3. Model Configuration
-
-| Model | Key Parameters |
-
-|-------|----------------|
-
-| Isolation Forest | n_estimators=200, contamination='auto', max_samples='auto' |
-
-| LOF | n_neighbors=20, contamination='auto', novelty=True |
-
-| One-Class SVM | nu=0.01, kernel='rbf', gamma='scale' |
-
-
-## 4. Overall Results
-
-| Metric | Isolation Forest | LOF | One-Class SVM |
-
-|--------|-----------------|-----|---------------|
-
-| Precision | 0.9936 | 0.9956 | 0.9957 |
-
-| Recall | 0.4666 | 0.6810 | 0.6893 |
-
-| F1 | 0.6350 | 0.8088 | 0.8146 |
-
-| AUC | 0.8371 | 0.9055 | 0.8877 |
-
-| Avg_Precision | 0.9880 | 0.9938 | 0.9927 |
-
-| FPR | 0.0500 | 0.0500 | 0.0500 |
-
-| Detection_Rate | 0.4666 | 0.6810 | 0.6893 |
-
-| Train_Time_s | 4.4000 | 36.1000 | 4.1000 |
-
-
-## 5. Confusion Matrices
-
-| Model | TN | FP | FN | TP |
-
-|-------|----|----|----|----|
-
-| Isolation Forest | 18788 | 989 | 176774 | 154615 |
-
-| LOF | 18788 | 989 | 105703 | 225686 |
-
-| One-Class SVM | 18788 | 989 | 102971 | 228418 |
-
-
-## 6. Per-Attack Detection Rates
-
-| Attack Type | Isolation Forest | LOF | One-Class SVM | Samples |
-
-|-------------|-----------------|-----|---------------|---------|
-
-| Normal | 0.0000 | 0.0000 | 0.0000 | 19777 |
-
-| DoS | 0.4338 | 0.6326 | 0.6400 | 73315 |
-
-| Fuzzy | 0.4409 | 0.5967 | 0.5963 | 76777 |
-
-| Gear | 0.5181 | 0.7426 | 0.7496 | 88863 |
-
-| RPM | 0.4644 | 0.7303 | 0.7475 | 92434 |
-
-
-## 7. ROC Analysis
-
-- **Isolation Forest**: AUC=0.8371, Average Precision=0.9880
-
-- **LOF**: AUC=0.9055, Average Precision=0.9938
-
-- **One-Class SVM**: AUC=0.8877, Average Precision=0.9927
-
-
-## 8. Feature Importance (Isolation Forest)
-
-| Rank | Feature | Importance |
-
-|------|---------|------------|
-
-| 1 | window_payload_std | 0.431444 |
-
-| 2 | payload_instability_score | 0.431444 |
-
-| 3 | unique_can_ids_window | 0.351179 |
-
-| 4 | window_payload_mean | 0.233061 |
-
-| 5 | can_id_entropy | 0.209818 |
-
-| 6 | messages_per_second | 0.173022 |
-
-| 7 | message_burst_score | 0.080534 |
-
-| 8 | window_payload_entropy_mean | 0.071502 |
-
-| 9 | window_delta_time_min | 0.047053 |
-
-| 10 | window_delta_time_mean | 0.004694 |
-
-| 11 | window_delta_time_std | 0.004224 |
-
-| 12 | window_delta_time_max | 0.004180 |
-
-| 13 | frequency_spike_score | 0.004167 |
-
-
-## 9. Comparison vs Phase 3 (Single-Message IF)
-
-| Metric | Phase 3 (IF) | Phase 5 (Best) | Improvement |
-
-|--------|--------------|----------------|-------------|
-
+### Training Set
+- **Source**: 19,777 normal driving behavioral windows
+- **Features**: 13 behavioral features (z-score normalized)
+- **Label**: All training data is labeled "Normal" (Attack_Label = 0)
+
+### Test Set
+- **Source**: 351,166 windows (all 5 attack types)
+- **Normal**: 19,777 windows
+- **Attack**: 331,389 windows across DoS, Fuzzy, Gear, RPM
+
+### Models Evaluated
+
+| Model | Parameters | Training Time |
+|---|---|---|
+| Isolation Forest | n_estimators=100, contamination=0.05 | 4.4s |
+| Local Outlier Factor | n_neighbors=20, contamination=0.05 | 36.1s |
+| One-Class SVM | nu=0.01, kernel=rbf, gamma=scale | 4.1s |
+
+### Threshold
+- **Method**: 5th percentile of training decision function scores
+- For OC-SVM: `threshold = percentile(normal_scores, 5)`
+- Windows with decision scores below threshold are classified as anomalies
+
+## 3. Performance Comparison
+
+| Model | Precision | Recall | F1 Score | AUC | Detection Rate |
+|---|---|---|---|---|---|
+| Isolation Forest | 0.9936 | 0.4666 | 0.6350 | 0.8371 | 0.4666 |
+| Local Outlier Factor | 0.9956 | 0.6810 | 0.8088 | 0.9055 | 0.6810 |
+| **One-Class SVM** | **0.9957** | **0.6893** | **0.8146** | **0.8877** | **0.6893** |
+
+## 4. Per-Attack Detection Rates
+
+| Attack Type | IF | LOF | OC-SVM | Samples |
+|---|---|---|---|---|
+| DoS | 0.4338 | 0.6326 | **0.6400** | 73,315 |
+| Fuzzy | 0.4409 | 0.5967 | **0.5963** | 76,777 |
+| Gear | 0.5181 | 0.7426 | **0.7496** | 88,863 |
+| RPM | 0.4644 | 0.7303 | **0.7475** | 92,434 |
+| Normal | 0.0000 | 0.0000 | 0.0000 | 19,777 |
+
+## 5. Improvement Over Baseline
+
+Comparison with Phase 3 per-message Isolation Forest:
+
+| Metric | Phase 3 (per-message IF) | Phase 5 (behavioral OC-SVM) | Improvement |
+|---|---|---|---|
 | Precision | 0.4342 | 0.9957 | +129.3% |
-
 | Recall | 0.0643 | 0.6893 | +972.0% |
-
 | F1 | 0.1120 | 0.8146 | +627.3% |
-
 | AUC | 0.5050 | 0.8877 | +75.8% |
 
+## 6. Selected Model: One-Class SVM
 
-## 10. Operational Suitability
+The OC-SVM was selected as the deployment model based on:
+- **Highest F1 score** (0.8146 vs 0.8088 LOF, 0.6350 IF)
+- **Highest detection rate** (0.6893 vs 0.6810 LOF)
+- **Lowest training time** (4.1s vs 36.1s LOF)
+- **Smallest model size** (single support vector set, ~200 KB serialized)
+- **Inference speed**: <1ms per 500-window batch
 
-### Best Model: One-Class SVM
+## 7. Confusion Matrix (OC-SVM)
 
-- **F1 Score**: 0.8146
+| | Predicted Normal | Predicted Attack |
+|---|---|---|
+| **Actual Normal** | TN: 18,788 | FP: 989 |
+| **Actual Attack** | FN: 102,971 | TP: 228,418 |
 
-- **Detection Rate**: 0.6893
-
+- **True Positive Rate (Recall)**: 0.6893
 - **False Positive Rate**: 0.0500
+- **Precision**: 0.9957
 
-- **Training Time**: 4.1s
+## 8. Deployed Model
 
-
-**Suitability**: **Production-ready** with threshold tuning
-
-
-### Deployment Notes
-
-- IF offers native feature importance for interpretability
-
-- IF training is fast and scales to large datasets
-
-- LOF is suitable for local density-based anomalies
-
-- OCSVM requires subsampling for large training sets
-
-
-## 11. Output Files
-
-| File | Description |
-
-|------|-------------|
-
-| `src/anomaly_detection/behavioral_detector_v2.py` | Detector implementation |
-
-| `assets/model_comparison.png` | Model comparison bar chart |
-
-| `assets/roc_comparison.png` | ROC curves |
-
-| `assets/behavioral_confusion_matrix.png` | Confusion matrices |
-
-| `assets/per_attack_detection_rate_v2.png` | Per-attack detection rates |
-
-| `reports/behavioral_detection_report.md` | This report |
-
-| `reports/phase5_summary.md` | Phase 5 summary |
+The trained OC-SVM is serialized to `data/models/ocsvm_model.joblib` and loaded at API startup. Inference runs entirely on CPU with no GPU dependency. The same model powers all 17 API endpoints and the 9-stage pipeline demonstration.

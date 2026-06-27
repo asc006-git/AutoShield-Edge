@@ -4,14 +4,14 @@
 # Large Data Files
 # ============================================
 dataset/
-data/
 *.csv
 *.txt
-!requirements.txt
-!docs/**/*.txt
+!README.md
 *.parquet
+!data/behavioral/*.parquet
 *.pkl
 *.joblib
+!data/models/*.joblib
 *.h5
 *.hdf5
 *.npy
@@ -83,3 +83,18 @@ Thumbs.db
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# ============================================
+# Node / Next.js Build Artifacts
+# ============================================
+node_modules/
+dashboard/.next/
+dashboard/out/
+dashboard/tsconfig.tsbuildinfo
+dashboard/next-env.d.ts
+
+# ============================================
+# Generated Assets (tracked via exceptions below)
+# ============================================
+# assets/ and reports/*.md are NOT excluded —
+# they are part of the submission package
