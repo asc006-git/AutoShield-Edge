@@ -19,35 +19,8 @@ AI at the Edge Solution for Automotive Cybersecurity
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)
-![Status](https://img.shields.io/badge/Status-Release%20Candidate-success?style=flat-square)
 
 </div>
-
----
-
-# Table of Contents
-
-- Overview
-- Problem Statement
-- Existing Challenges
-- Proposed Solution
-- Key Features
-- System Architecture
-- Behavioral Cyber Twin
-- Nine-Stage AI Pipeline
-- Technology Stack
-- Repository Structure
-- Dataset
-- Feature Engineering
-- Machine Learning Pipeline
-- Backend Architecture
-- Frontend Demonstration
-- API Overview
-- Experimental Results
-- Installation
-- Usage
-- Future Scope
-- Project Highlights
 
 ---
 
@@ -186,34 +159,30 @@ Each layer contributes information to the next while maintaining complete tracea
 
 # High-Level Architecture
 
+## High-Level System Architecture
+
 ```text
-                    Connected Vehicle
-                           │
-                    CAN Bus Messages
-                           │
-                           ▼
-             Data Acquisition & Preprocessing
-                           │
-                           ▼
-                Behavioral Cyber Twin
-                           │
-                           ▼
-              Behavioral Feature Extraction
-                           │
-                           ▼
-              One-Class AI Threat Detector
-                           │
-                           ▼
-               Vehicle Cyber Health Engine
-                           │
-                           ▼
-            Explainable Threat Story Engine
-                           │
-                           ▼
-             Self-Healing Response Agent
-                           │
-                           ▼
-             Recovery & Continuous Monitoring
++--------------------+     +-------------------------+     +----------------------------+
+| Connected Vehicle  | --> | CAN Bus Communication   | --> | Data Acquisition &         |
+| (ECUs & Sensors)   |     | (Real-Time CAN Frames)  |     | Preprocessing              |
++--------------------+     +-------------------------+     +----------------------------+
+                                                              |
+                                                              v
++----------------------+     +---------------------------+     +--------------------------+
+| Behavioral           | --> | Behavioral Feature        | --> | One-Class Behavioral AI  |
+| Cyber Twin           |     | Extraction Engine         |     | Threat Detector          |
++----------------------+     +---------------------------+     +--------------------------+
+                                                              |
+                                                              v
++----------------------+     +---------------------------+     +--------------------------+
+| Vehicle Cyber        | --> | Explainable Threat Story  | --> | Self-Healing Response    |
+| Health Engine        |     | Engine                    |     | Agent                    |
++----------------------+     +---------------------------+     +--------------------------+
+                                                              |
+                                                              v
+                                                +--------------------------------------+
+                                                | Continuous Monitoring & Recovery     |
+                                                +--------------------------------------+
 ```
 
 ---
@@ -438,41 +407,21 @@ The objective is not only to detect attacks but also to reduce their operational
 
 The complete AutoShield Edge workflow consists of nine sequential stages.
 
+## Nine-Stage AI Pipeline
+
 ```text
-Stage 1
-Vehicle CAN Communication
-        │
-        ▼
-Stage 2
-Behavioral Window Generation
-        │
-        ▼
-Stage 3
-Behavioral Feature Extraction
-        │
-        ▼
-Stage 4
-Behavioral Threat Detection
-        │
-        ▼
-Stage 5
-Vehicle Cyber Health Score
-        │
-        ▼
-Stage 6
-Explainable AI Analysis
-        │
-        ▼
-Stage 7
-Threat Story Generation
-        │
-        ▼
-Stage 8
-Self-Healing Response
-        │
-        ▼
-Stage 9
-Recovery Monitoring
++------------------+    +-------------------+    +----------------------+    +---------------------+    +----------------------+
+| Stage 1          | -> | Stage 2           | -> | Stage 3             | -> | Stage 4            | -> | Stage 5             |
+| Vehicle CAN Bus  |    | Behavioral Window |    | Behavioral Feature  |    | Behavioral Threat  |    | Cyber Health Score |
+| Communication    |    | Generation        |    | Extraction          |    | Detection          |    | Calculation        |
++------------------+    +-------------------+    +----------------------+    +---------------------+    +----------------------+
+                                                                                                                                  |
+                                                                                                                                  v
++------------------+ <- +-------------------+ <- +----------------------+ <- +---------------------+
+| Stage 9          |    | Stage 8           |    | Stage 7             |    | Stage 6            |
+| Recovery &       |    | Self-Healing      |    | Threat Story        |    | Explainable AI     |
+| Monitoring       |    | Response Agent    |    | Generation          |    | Analysis           |
++------------------+    +-------------------+    +----------------------+    +---------------------+
 ```
 
 Each stage receives the outputs of the previous stage, ensuring complete traceability from raw CAN communication to the final cybersecurity decision.
@@ -732,26 +681,18 @@ During deployment, any behavioural deviation from this learned baseline is consi
 
 The workflow consists of:
 
+## Machine Learning Pipeline
+
 ```text
-Raw CAN Messages
-        │
-        ▼
-Preprocessing
-        │
-        ▼
-Behavioral Windows
-        │
-        ▼
-Feature Engineering
-        │
-        ▼
-Feature Scaling
-        │
-        ▼
-One-Class Model Training
-        │
-        ▼
-Behavioral Threat Detection
++-------------------+ --> +-------------------+ --> +-----------------------+ --> +---------------------+ --> +------------------+ --> +-----------------------+
+| Raw CAN Messages  |     | Data              |     | Behavioral Windows    |     | Feature             |     | Feature Scaling  |     | One-Class SVM         |
+|                   |     | Preprocessing     |     | (50 Messages)         |     | Engineering         |     |                  |     | Behavioral Learning   |
++-------------------+     +-------------------+     +-----------------------+     +---------------------+     +------------------+     +-----------------------+
+                                                                                                                                                                 |
+                                                                                                                                                                 v
+                                                                                                                                            +-------------------------------+
+                                                                                                                                            | Behavioral Threat Detection   |
+                                                                                                                                            +-------------------------------+
 ```
 
 ---
@@ -836,32 +777,17 @@ Every stage of the pipeline is modular, allowing each component to operate indep
 
 # Backend Processing Flow
 
+## Backend Inference Pipeline
+
 ```text
-Frontend Request
-        │
-        ▼
-FastAPI Endpoint
-        │
-        ▼
-Behavioral Cyber Twin
-        │
-        ▼
-Behavioral Feature Extraction
-        │
-        ▼
-One-Class SVM Inference
-        │
-        ▼
-Cyber Health Engine
-        │
-        ▼
-Threat Story Engine
-        │
-        ▼
-Self-Healing Response Agent
-        │
-        ▼
-JSON Response
++------------------+ --> +----------------------+ --> +----------------------+ --> +-----------------------+ --> +----------------------+
+| Frontend Request |     | FastAPI API Layer    |     | Behavioral Cyber Twin|     | Feature Extraction    |     | One-Class SVM        |
++------------------+     +----------------------+     +----------------------+     +-----------------------+     +----------------------+
+                                                                                                                                             |
+                                                                                                                                             v
++----------------------+ --> +-------------------------+ --> +---------------------------+ --> +----------------------+
+| Cyber Health Engine  |     | Threat Story Engine     |     | Self-Healing Response     |     | JSON API Response    |
++----------------------+     +-------------------------+     +---------------------------+     +----------------------+
 ```
 
 ---
@@ -909,23 +835,17 @@ Any significant deviation from the learned behavioral baseline is treated as a p
 
 # Threat Detection Workflow
 
+## Behavioral Threat Detection Engine
+
 ```text
-Behavioral Window
-        │
-        ▼
-Feature Scaling
-        │
-        ▼
-One-Class SVM
-        │
-        ▼
-Decision Function
-        │
-        ▼
-Anomaly Score
-        │
-        ▼
-Threat Classification
++----------------------+ --> +--------------------+ --> +---------------------+ --> +----------------------+ --> +-------------------------+
+| Behavioral Window    |     | Feature Scaling    |     | One-Class SVM Model |     | Decision Function    |     | Anomaly Score           |
++----------------------+     +--------------------+     +---------------------+     +----------------------+     +-------------------------+
+                                                                                                                                                  |
+                                                                                                                                                  v
+                                                                                                                               +------------------------------+
+                                                                                                                               | Threat Classification       |
+                                                                                                                               +------------------------------+
 ```
 
 ---
@@ -1093,23 +1013,17 @@ This transforms intrusion detection into an active cyber defense mechanism.
 
 # Response Workflow
 
+## Autonomous Defense Workflow
+
 ```text
-Threat Detection
-        │
-        ▼
-Cyber Health Score
-        │
-        ▼
-Threat Story
-        │
-        ▼
-Response Decision
-        │
-        ▼
-Recommended Mitigation
-        │
-        ▼
-Recovery Monitoring
++---------------------+ --> +----------------------+ --> +-----------------------+ --> +------------------------+ --> +----------------------+
+| Threat Detection    |     | Cyber Health Engine  |     | Threat Story Engine   |     | Response Decision      |     | Recommended Mitigation|
++---------------------+     +----------------------+     +-----------------------+     +------------------------+     +----------------------+
+                                                                                                                                                 |
+                                                                                                                                                 v
+                                                                                                                               +------------------------------+
+                                                                                                                               | Recovery Monitoring         |
+                                                                                                                               +------------------------------+
 ```
 
 ---
@@ -1128,32 +1042,22 @@ The demonstration is designed to help judges understand how behavioral informati
 
 # Demonstration Workflow
 
+## Frontend Demonstration Workflow
+
 ```text
-Landing Page
-        │
-        ▼
-Attack Selection
-        │
-        ▼
-Run Live Demonstration
-        │
-        ▼
-Behavioral Pipeline Execution
-        │
-        ▼
-Threat Detection
-        │
-        ▼
-Cyber Health Visualization
-        │
-        ▼
-Threat Story
-        │
-        ▼
-Self-Healing Response
-        │
-        ▼
-Recovery Summary
++-----------------+ --> +------------------+ --> +-------------------------+ --> +----------------------+ --> +----------------------+
+| Landing Page    |     | Attack Selection |     | Run Live Demonstration  |     | Pipeline Execution   |     | Threat Detection     |
++-----------------+     +------------------+     +-------------------------+     +----------------------+     +----------------------+
+                                                                                                                                             |
+                                                                                                                                             v
++----------------------+ --> +-----------------------+ --> +--------------------------+
+| Cyber Health Engine  |     | Threat Story Engine   |     | Self-Healing Response    |
++----------------------+     +-----------------------+     +--------------------------+
+                                                                                               |
+                                                                                               v
+                                                                                 +--------------------------+
+                                                                                 | Recovery Summary         |
+                                                                                 +--------------------------+
 ```
 
 ---
@@ -1177,24 +1081,23 @@ Recovery Summary
 
 The complete AutoShield Edge platform transforms raw CAN Bus communication into autonomous cybersecurity decisions.
 
+## End-to-End AutoShield Edge Workflow
+
 ```text
-Vehicle
-   │
-CAN Bus
-   │
-Behavioral Window
-   │
-Feature Engineering
-   │
-One-Class SVM
-   │
-Cyber Health Score
-   │
-Threat Story
-   │
-Self-Healing Response
-   │
-Recovery
++--------------------+ --> +---------------------+ --> +------------------------+ --> +-----------------------+
+| Connected Vehicle  |     | CAN Bus Messages    |     | Behavioral Windows     |     | Feature Engineering   |
++--------------------+     +---------------------+     +------------------------+     +-----------------------+
+                                                                                                                 |
+                                                                                                                 v
++----------------------+ --> +----------------------+ --> +-------------------------+ --> +--------------------------+
+| One-Class SVM AI     |     | Cyber Health Engine  |     | Threat Story Engine     |     | Self-Healing Response    |
++----------------------+     +----------------------+     +-------------------------+     +--------------------------+
+                                                                                                                  |
+                                                                                                                  v
+                                                                                               +--------------------------------+
+                                                                                               | Continuous Recovery &         |
+                                                                                               | Security Monitoring           |
+                                                                                               +--------------------------------+
 ```
 
 This modular architecture enables AutoShield Edge to detect, explain, and respond to cyber threats while maintaining transparency throughout the entire decision-making process.
@@ -1337,90 +1240,6 @@ The platform automatically produces:
 - Response Decisions
 - Recovery Summaries
 - Interactive Dashboard
-
----
-
-# Demonstration Screens
-
-The following screenshots should be included after completing the implementation.
-
-## Landing Page
-
-```
-docs/screenshots/landing-page.png
-```
-
-Shows the AutoShield Edge homepage and project introduction.
-
----
-
-## Attack Selection
-
-```
-docs/screenshots/attack-selection.png
-```
-
-Displays available attack scenarios before starting the demonstration.
-
----
-
-## Live Pipeline Execution
-
-```
-docs/screenshots/pipeline-execution.png
-```
-
-Shows all nine stages executing sequentially.
-
----
-
-## Behavioral Threat Detection
-
-```
-docs/screenshots/threat-detection.png
-```
-
-Displays anomaly score, confidence, and detected attack.
-
----
-
-## Cyber Health Dashboard
-
-```
-docs/screenshots/cyber-health.png
-```
-
-Illustrates Cyber Health Score together with component breakdown.
-
----
-
-## Threat Story
-
-```
-docs/screenshots/threat-story.png
-```
-
-Shows Explainable AI output and generated threat narrative.
-
----
-
-## Self-Healing Response
-
-```
-docs/screenshots/self-healing.png
-```
-
-Displays recommended defensive actions.
-
----
-
-## Recovery Summary
-
-```
-docs/screenshots/recovery-summary.png
-```
-
-Shows mitigation outcome and restored cybersecurity condition.
 
 ---
 
