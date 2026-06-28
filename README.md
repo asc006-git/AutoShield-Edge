@@ -3,7 +3,6 @@
 # AutoShield Edge
 
 ### Behavioral Cyber Twin for Connected Vehicle Cybersecurity
-
 AI at the Edge Solution for Automotive Cybersecurity
 
 </div>
