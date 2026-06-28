@@ -52,7 +52,6 @@ Although CAN Bus is lightweight and efficient, it was originally designed withou
 - Confidential communication
 
 As a result, if an attacker gains access to the vehicle network through compromised ECUs, diagnostic ports, infotainment systems, wireless interfaces, or aftermarket devices, malicious CAN frames can be injected into the network without being rejected.
-
 Successful attacks can manipulate vehicle behaviour by transmitting forged messages that appear legitimate to other ECUs.
 
 Examples include:
